@@ -37,14 +37,30 @@
         .replaceAll('#'+id+')', '#transfer-'+id+')');
     });
     avatar.innerHTML = markup.replaceAll('transfer-', 'avatar-');
+    const resting = site.flight.wingPose(0, 0);
+    avatar.querySelector('#avatar-wingL').style.transform = resting[0];
+    avatar.querySelector('#avatar-wingR').style.transform = resting[1];
     if (!site.motion.enabled) return Promise.resolve();
     element.innerHTML = markup; dialog.append(element);
     const pose = rect => `translate(${rect.left}px,${rect.top}px) scale(${rect.width/400})`;
     const animation = element.animate([
       {transform:pose(from)},
+      {transform:pose({left:(from.left+to.left)/2,top:(from.top+to.top)/2-36,width:(from.width+to.width)/2}),offset:.5},
       {transform:pose(to)}
     ], {duration:620,easing:'cubic-bezier(.22,.75,.22,1)',fill:'forwards'});
     const current = transfer = {element,animation};
+    // Keep the same feather stroke through the transfer, settling into the
+    // header at the end instead of carrying a frozen spread-wing pose.
+    const beats = Array.from({length:17}, (_, index) => {
+      const t = index / 16;
+      return site.flight.wingPose(t * Math.PI * 2 * .9, Math.sin(Math.PI * t));
+    });
+    ['#transfer-wingL', '#transfer-wingR'].forEach((selector, index) => {
+      const wing = element.querySelector(selector);
+      const start = wing.style.transform;
+      wing.animate(beats.map((pose, frame) => ({transform:frame === 0 ? start : pose[index]})),
+        {duration:620,easing:'linear',fill:'forwards'});
+    });
     return animation.finished.catch(() => {}).then(() => {
       element.remove(); if (transfer === current) transfer = null;
     });

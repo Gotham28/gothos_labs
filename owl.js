@@ -26,18 +26,36 @@
   const clamp = (n, min = 0, max = 1) => Math.min(max, Math.max(min, n));
   const ease = t => t < .5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
   const mix = (a, b, t) => a + (b - a) * t;
+  // Shared by the page mascot and its temporary chat-flight clone.
+  function wingPose(phase, spread, turn = 0) {
+    const cycle = (phase / (Math.PI * 2)) % 1;
+    const downstroke = cycle < .43;
+    const beatT = downstroke ? cycle / .43 : (cycle - .43) / .57;
+    const beatEase = (1 - Math.cos(Math.PI * beatT)) / 2;
+    const extension = downstroke ? 1 - beatEase : beatEase;
+    const flap = mix(-76, -48 + extension * 105, spread);
+    const recovery = downstroke ? 0 : Math.sin(Math.PI * beatT);
+    const flex = mix(.72, 1 - .16 * recovery, spread);
+    const reach = mix(.70, 1 - .12 * recovery, spread);
+    const sweep = Math.sin(phase - .4) * 5 * spread;
+    const bankOffset = turn * .12 * spread;
+    return [
+      `rotate(${flap + bankOffset}deg) skewY(${sweep}deg) scale(${reach},${flex})`,
+      `rotate(${-flap + bankOffset}deg) skewY(${-sweep}deg) scale(${reach},${flex})`
+    ];
+  }
   let tops = [], heights = [], raf = 0, previous = 0, lastY = scrollY;
   let direction = 0, velocity = 0, clock = 0, nextBlink = 4, blinkUntil = 0;
   let pointer = { x: 0, y: 0 }, gaze = { x: 0, y: 0 };
   let previewTarget = { x: 0, y: 0 };
   let state = null, initialized = false, logo = 0, lastSection = -1;
-  let chat = false, chatStarted = 0, returnStarted = -Infinity, pulsePlayed = false;
-  let wingSpread = 0, wingPhase = 0;
-  const chatPanel = document.querySelector(".chat-panel");
+  let chat = false, pulsePlayed = false;
+  let wingSpread = 0, wingPhase = 0, airspeed = 0, bank = 0;
   const chatDialog = document.getElementById('chat-dialog');
   function syncChat() {
     // Chat owns a separate avatar, leaving the page flight state untouched.
     const open = chatDialog.open;
+    chat = open;
     layer.style.visibility = open ? 'hidden' : '';
     owl.tabIndex = open ? -1 : 0;
   }
@@ -49,19 +67,19 @@
     request();
   }
   const desktop = [
-    { x: -.12, y: .06, s: .34, roll: 0 },
-    { x: -.25, y: .04, s: .36, roll: -3 },
-    { x: -.02, y: .24, s: .26, roll: 4 },
-    { x: -.25, y: .06, s: .34, roll: -3 },
+    { x: -.17, y: .34, s: .19, roll: 0 },
+    { x: -.455, y: .16, s: .14, roll: 0 },
+    { x: .44, y: .25, s: .16, roll: 0 },
+    { x: -.28, y: .25, s: .24, roll: 0 },
     { x: 0, y: .14, s: .24, roll: 0 }
   ];
   function frames() {
     if (innerWidth >= 760) return desktop;
     return [
-      { x: -.09, y: -.02, s: .28, roll: 0 },
-      { x: .18, y: -.29, s: .24, roll: -4 },
-      { x: .24, y: -.32, s: .20, roll: 4 },
-      { x: .18, y: -.29, s: .24, roll: -4 },
+      { x: -.34, y: -.36, s: .10, roll: 0 },
+      { x: -.34, y: -.36, s: .10, roll: 0 },
+      { x: .34, y: -.36, s: .10, roll: 0 },
+      { x: -.34, y: -.36, s: .10, roll: 0 },
       { x: 0, y: .12, s: .25, roll: 0 }
     ];
   }
@@ -86,7 +104,9 @@
     const K = frames(), p = progress(scrollY);
     const i = Math.min(K.length - 2, Math.floor(p));
     const t = clamp(p - i);
-    const moving = Math.sin(t * Math.PI);
+    // A zero-slope takeoff/landing and lifted arc, following fly.mp4.
+    const travel = t * t * (3 - 2 * t);
+    const moving = Math.sin(travel * Math.PI);
     const delta = scrollY - lastY;
     lastY = scrollY;
     const smooth = 1 - Math.exp(-dt * 6);
@@ -94,59 +114,51 @@
     velocity = mix(velocity, delta / Math.max(1, innerHeight) / dt, smooth);
     const D = motion ? clamp(velocity * .9, -1, 1) : 0;
     const target = {};
-    for (const key of ['x', 'y', 's', 'roll']) target[key] = mix(K[i][key], K[i + 1][key], t);
-    if (motion && !chat) {
-      target.y -= moving * .10;
-      target.x += (i % 2 ? -1 : 1) * moving * .035;
-      target.roll += direction * moving * (i % 2 ? 6 : -6);
+    for (const key of ['x', 'y', 's', 'roll']) target[key] = mix(K[i][key], K[i + 1][key], travel);
+    if (motion) {
+      target.y -= moving * (innerWidth < 760 ? .045 : .20);
     }
     let L = i === K.length - 2 ? ease(clamp((t - .55) / .45)) : 0;
     if (p >= K.length - 1) L = 1;
-    if (!motion && !chat) {
+    if (!motion) {
       const still = Math.min(K.length-1, Math.round(p));
       Object.assign(target, K[still]);
       L = still === K.length-1 ? 1 : 0;
     }
-    if (motion && !chat && now - returnStarted < 650) L *= ease(clamp((now - returnStarted - 350) / 300));
     const size = Math.min(innerHeight * target.s, innerWidth * (innerWidth < 760 ? .58 : .32));
-    const safe = size * .76 + 18;
+    const safe = size * .48 + 12;
     target.x = clamp(innerWidth * (.5 + target.x), safe, innerWidth - safe);
     target.y = innerHeight * (.5 + target.y);
     target.s = size;
     if (!initialized) { state = { ...target }; initialized = true; }
-    const follow = motion ? 1 - Math.exp(-dt * (chat ? 7 : 9)) : 1;
+    const beforeX = state.x, beforeY = state.y;
+    const follow = motion ? 1 - Math.exp(-dt * 8) : 1;
     for (const key of ['x', 'y', 's', 'roll']) state[key] = mix(state[key], target[key], follow);
+    const vx = (state.x - beforeX) / dt;
+    const vy = (state.y - beforeY) / dt;
+    // Drive flight from actual travel, not section position: stopping midway
+    // lets the wings fold, and reversing scroll reverses the bank smoothly.
+    const speed = Math.hypot(vx, vy) / Math.max(1, innerHeight);
+    airspeed = motion && !chat ? mix(airspeed, speed, 1 - Math.exp(-dt * 10)) : 0;
+    bank = motion && !chat ? mix(bank, clamp(vx / innerWidth * 65, -38, 38), 1 - Math.exp(-dt * 7)) : 0;
     logo = motion ? mix(logo, L, 1 - Math.exp(-dt * 9)) : L;
     if (Math.abs(logo - L) < .002) logo = L;
-    let u = motion ? clamp(moving + Math.abs(D) * .8) * (1 - L) : 0;
-    if (chat) u = motion ? clamp(1 - (now - chatStarted) / 650) : 0;
-    else if (motion && now - returnStarted < 650) u = Math.max(u, clamp(1 - (now - returnStarted) / 650) * (1-L));
-    wingSpread = !motion ? 0 : mix(wingSpread, u, 1-Math.exp(-dt*6));
+    let u = motion && !chat ? clamp(airspeed * 5 + Math.abs(D) * .22) : 0;
+    wingSpread = !motion ? 0 : mix(wingSpread, u, 1-Math.exp(-dt*(u > wingSpread ? 12 : 5)));
     u = wingSpread;
     // Integrate frequency: multiplying elapsed time by a changing speed jumps phase.
-    if (motion) wingPhase = (wingPhase + dt * Math.PI * 2 * (1.35 + .65 * u)) % (Math.PI * 2);
+    if (motion && u > .002) wingPhase = (wingPhase + dt * Math.PI * 2 * (1.38 + .12 * clamp(airspeed))) % (Math.PI * 2);
     // A short powered downstroke and longer folded recovery, with zero
     // velocity at both reversals. Integrated phase stays continuous.
-    const cycle = wingPhase / (Math.PI * 2);
-    const downstroke = cycle < .38;
-    const beatT = downstroke ? cycle / .38 : (cycle - .38) / .62;
-    const beatEase = (1 - Math.cos(Math.PI * beatT)) / 2;
-    const extension = downstroke ? 1 - beatEase : beatEase;
-    const flap = (12 + extension * 48) * u;
-    // Narrow the wing on recovery; feathers trail the shoulder slightly.
-    const recovery = downstroke ? 0 : Math.sin(Math.PI * beatT);
-    const featherFlex = 1 - .10 * recovery * u;
-    const sweep = Math.sin(wingPhase - .4) * 3 * u;
-    wingL.style.transform = `rotate(${flap}deg) skewY(${sweep}deg) scale(${1 - .16 * recovery * u},${featherFlex})`;
-    wingR.style.transform = `rotate(${-flap}deg) skewY(${-sweep}deg) scale(${1 - .16 * recovery * u},${featherFlex})`;
+    [wingL.style.transform, wingR.style.transform] = wingPose(wingPhase, u, bank);
     wingL.style.opacity = wingR.style.opacity = '1';
-    const bob = motion && !chat ? (Math.sin(clock * 1.8) * 3 * (1-u) + Math.sin(wingPhase - .65) * 2 * u) : 0;
+    const bob = motion && !chat ? (Math.sin(clock * 1.8) * 2 * (1-u) + Math.sin(wingPhase - .65) * 5 * u) : 0;
     const px = motion && !chat ? pointer.x * 8 * (1 - L) : 0;
     const py = motion && !chat ? pointer.y * 5 * (1 - L) : 0;
-    const paintSize = Math.min(state.s, (innerWidth-24) / (1+.48*u));
-    const paintSafe = paintSize * (.5 + .24*u) + 12;
+    const paintSize = Math.min(state.s, (innerWidth-24) / 1.88);
+    const paintSafe = paintSize * (.48 + .46*u) + 12;
     const paintX = clamp(state.x + px, paintSafe, innerWidth-paintSafe);
-    owl.style.transform = `translate3d(${paintX}px,${state.y + py + bob}px,0) translate(-50%,-50%) rotate(${state.roll}deg) rotateX(${D * 8}deg) scale(${paintSize / 400})`;
+    owl.style.transform = `translate3d(${paintX}px,${state.y + py + bob}px,0) translate(-50%,-50%) rotate(${state.roll + bank}deg) rotateY(${-bank * .3}deg) scale(${paintSize / 400})`;
     // Footer progress reveals the wordmark, never replaces the character.
     owl.style.setProperty('--L', '0');
     document.getElementById('shadow').style.cssText = `transform:translate3d(${paintX}px,${state.y + paintSize * .57}px,0) translate(-50%,-50%) scale(${paintSize / 400});opacity:${(1-u)*(1-logo)*.18}`;
@@ -207,5 +219,5 @@
   document.fonts.ready.then(measure);
   measure();
   // Pure helpers exposed for meaningful geometry checks, not customer data.
-  site.flight = { progress, measure, request };
+  site.flight = { progress, measure, request, wingPose };
 })();
