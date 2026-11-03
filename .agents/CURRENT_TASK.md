@@ -1,298 +1,126 @@
 # Current Task
 
 ## Feature
-- Rebuild the landing page as six full-screen sections that change one at a time with a seamless, uninterruptible transition, with the owl flying during each transition and perching once it ends. Move product detail onto two new product pages, and make the landing page more beautiful.
+- Serve only the public website on Vercel: add a root `.vercelignore` so internal project files are not published at gothoslabs.com. This also makes Vercel serve the site as static files instead of running `server.mjs`, which is the cause of the current live 404s.
 
 ## Plan reference
-- MASTER_PLAN.md §3 is the nearest section; append a dated §9 entry, "Full-screen section landing and product pages". Append only.
-- STATUS.md "Last updated" 2026-10-28: stale for this area.
-- Baseline: branch `bird-updated`, origin at eb3f346c, plus earlier unreviewed and uncommitted work: Part 1 (landing content, real logo), Fix round 1 (flight fixes) and Part 2 (owl sprite animation). Evidence for those is in HANDOFF.md.
-- Developer order (2026-11-02): build first, then one combined High-assurance review in an Opus session, then one close-out and push.
-
-## What carries over and what is replaced
-- Kept: real logo (`assets/logo/gothos-logo.png`), the owl sprite atlas and renderer from Part 2, the chat avatar changes, the enquiry form, the Approved copy below, `tools/build-owl-atlas.py`.
-- Replaced: the current five-section landing layout, the native-scroll reading of tall sections, the Fix round 1 y-band, climb and read-fade rules, and the current `section-scroll.js` behaviour.
-- Moved: ELogBook and AROGYA detail, plus the interactive six-screen preview, go to the product pages.
+- Not in MASTER_PLAN.md: no section covers hosting. Unplanned work, logged under §9.
+- STATUS.md "Last updated" 2026-11-03: rebuild closed (`350c524`, `5d2b9c2`); PR #2 merged to `main` as `e554503` on 2026-11-03 by the developer. STATUS.md does not record the merge yet.
+- Live state, checked 2026-11-03 in the planning session: DNS is live (`gothoslabs.com` A `216.198.79.1`; `www` CNAME to `0e616471c19d546e.vercel-dns-017.com`), HTTPS is valid, and apex → www is a 308 redirect. Every path returns 404, on `www.gothoslabs.com` and `gothoslabs.vercel.app` alike, including `/`, `/elogbook.html`, `/assets/owl/owl-atlas.json` and `/fonts/poppins-400.woff2`. The 404 has body `Not found` and `Content-Type: text/plain`, which is exactly what `server.mjs` sends in its catch branch. Vercel is running `server.mjs` as a Node function, and the function can't read the static files. Ignoring `server.mjs` should make Vercel fall back to static serving; the preview check below must prove it.
+- Repository move (developer decision, 2026-11-03: "Move to Gotham28 entirely"). Vercel deploys from `Gotham28/gothos_labs` (private, `main`), not `x3O8/Gothos-labs`. At scoping, its only commit was `bab69aa` "Initial commit", with a tree (`0c96bd9c`) identical to `x3O8/Gothos-labs` `main` at `e554503`. From now on `Gotham28/gothos_labs` is the only repo for this project; `x3O8/Gothos-labs` is no longer updated.
+- Hosting decisions (developer, 2026-11-02; repo updated 2026-11-03): Vercel project `gothos_labs`, imported from `Gotham28/gothos_labs` `main`, preset Other, no build command, root output; domain `gothoslabs.com` registered at Spaceship, Spaceship nameservers kept; the developer makes every Vercel and DNS click.
 
 ## MASTER_PLAN.md update
-- [ ] Append the §9 entry above. Append only; keep the earlier entries.
-
-## Landing page — six sections, in order
-1. Hero: "Gothos Labs" and "Intelligent software that sees further". Nothing else.
-2. What we do: the approved draft below. This is the only section with more than introductory text.
-3. ELogBook: short intro, an illustrative screenshot, and an "Explore ELogBook" button to `elogbook.html`.
-4. AROGYA: short intro, an illustrative screenshot, the one-line disclaimer, and an "Explore AROGYA" button to `arogya.html`.
-5. Talk to the owl: one or two lines introducing Hoot as the website guide, and a "Talk to Hoot" button that opens the chat.
-6. Contact: "Talk to us" with the existing enquiry form, its honest not-sent note, and a slim footer line (©, Pause motion, links).
-
-## Copy
-### Approved for this task (developer-supplied or developer-directed 2026-11-02)
-- Hero: "Gothos Labs" / "Intelligent software that sees further".
-- What we do. The developer's direction was "we bring AI to your software so it becomes better". Draft wording, approved when this plan is approved:
-  - Heading: "We bring AI to your software, so it works better."
-  - Body: "Gothos Labs builds AI into the software people already rely on, so everyday work gets simpler and better. We start from a real workflow, build with the people who use it, and keep each organisation's information its own. ELogBook and AROGYA are where we started: one for postgraduate medical training, one for hospitals and their patients."
-- ELogBook section intro: "A digital logbook for postgraduate medical training." + "Residents log their work, professors review it, and Heads of Department track progress against training targets."
-- AROGYA section intro: "An AI assistant that speaks your patients' language." + "Answers in English and Malayalam, helps patients find doctors and book appointments, on the web and on WhatsApp." + disclaimer: "General information only. It does not diagnose or replace a doctor. In an emergency, contact your local emergency services."
-- Talk to the owl: "Ask the owl" + "Hoot is our website guide. Ask about Gothos Labs, our products, or how to work with us." Hoot gives no medical advice. *(Removed by developer decision, Fix round 2: that line is not on the page.)*
-- Contact: "Talk to us" plus the existing form text, unchanged.
-- Section intros for ELogBook, AROGYA and Talk to the owl are condensed from the approved copy below and add no new claims.
-
-### Product pages — approved copy (developer-supplied 2026-11-02; use exactly)
-#### `elogbook.html`
-- Headline and one-liner: "A digital logbook for postgraduate medical training. Residents log cases, procedures and academic work, professors review them, and Heads of Department track progress against training targets."
-- The problem: "Paper logbooks get lost, are reviewed late, and make it hard for a department to see where residents stand against requirements."
-- How it works, by role:
-  - Residents: log clinical cases, procedures and academic activities, and see progress against targets.
-  - Professors: review and sign off on the residents assigned to them.
-  - HOD: a department-wide view of training progress.
-- Key features:
-  - Case, procedure and academic logs
-  - Professor review and approval
-  - An HOD portal
-  - Leave and attendance records
-  - Postings and research tracking
-  - Per-department configuration, not hardcoded to one specialty
-- Pilot: "Currently in pilot with the Pediatrics department"
-- Privacy and access: residents see their own records, professors see their assigned residents, and HODs see their department.
-- Interactive six-screen preview, labelled illustrative.
-- Call to action: "Request a demo" and "Talk to us", both to `index.html#contact`.
-
-#### `arogya.html`
-- Headline: "An AI assistant that speaks your patients' language."
-- One-liner: "AROGYA is a multilingual (English and Malayalam) AI assistant for hospitals. It helps patients find doctors, book appointments and get answers from the hospital's own information, on the web and on WhatsApp."
-- What it does:
-  - Speaks Malayalam and English. Patients can ask in either language and get a natural reply.
-  - Books appointments. It handles doctor search, schedules and confirmations, and sends WhatsApp reminders.
-  - Answers from the hospital's own information. Replies come from each hospital's own doctors, services and knowledge base, not from generic web content.
-  - Each hospital is kept separate. One deployment serves several hospitals, and a hospital's data never appears in another hospital's answers.
-- Proof point: "In live use at a hospital in Kerala." Never name the hospital.
-- Disclaimer, unchanged: "General information only. It does not diagnose or replace a doctor. In an emergency, contact your local emergency services."
-- The labelled illustrative chat card; the disabled "Live demo coming soon" button.
-- Call to action: "Request a demo" and "Talk to us", both to `index.html#contact`.
-
-### Developer decisions on record
-- The Kerala hospital agreed to the proof line. WhatsApp, booking confirmations and WhatsApp reminders are live. Product names are AROGYA and ELogBook.
-- Contact is the existing enquiry form; no email, phone or address is invented.
-- Screenshots are snapshots of the existing illustrative previews, labelled illustrative.
-
-## Section transitions (rewrite of `section-scroll.js`)
-- Every landing section fills the viewport exactly (100dvh, with an svh/vh fallback). The page is never left between sections.
-- One gesture moves exactly one section: one wheel or trackpad gesture, one swipe, or one key press. Trackpad momentum and fast repeated wheels must never skip a section or start a second move.
-- A transition runs 900–1200ms with an ease-in-out curve and cannot be stopped or reversed midway. Input during it is ignored.
-- Keys: ArrowDown, PageDown and Space go next; ArrowUp, PageUp and Shift+Space go back; Home and End go first and last. Keys are left alone while focus is in a form field or the chat dialog is open.
-- Touch: a swipe over about 40px, or a fast flick, moves one section. Pull-to-refresh and the browser chrome stay usable.
-- Header links, the side dot navigation and deep links (`#what-we-do`, `#elogbook`, `#arogya`, `#owl`, `#contact`) move straight to the target in one transition. The URL hash updates, and back/forward work. *(Fix round 2: such input arriving during a move is ignored; when the move ends the screen re-syncs to the URL hash.)*
-- Tabbing to an element in another section brings that section in. After each move, focus goes to the new section's heading without a scroll jump.
-- Resizing or rotating keeps the current section aligned.
-- Reduced motion and Pause motion: instant change with a crossfade of at most 200ms; the owl appears at its perch.
-- Every section's content fits without internal scrolling at 360x640, 390x844, 1280x720, 1366x768 and 1440x900. If one cannot, halt and report; do not let it scroll. *(Superseded by developer decision, Fix round 2: short or zoomed screens, or content that does not fit, fall back to normal scrolling; the five listed sizes stay on the deck.)*
-
-## Owl
-- Visible on every frame of the landing page; never faded or hidden while browsing sections. The chat dialog may still take it over as today.
-- Each section has a designed perch spot in its layout, at desktop and phone sizes, where the owl rests without covering text, buttons, the screenshot or the form.
-- During a transition the owl flies from the current perch to the next one, synced to the transition's progress. It takes off and lands through the crouch frame, and turns and beats its wings per Part 2's sprite rules. Jumps across several sections are one direct flight.
-- Reversing direction flies it back. Rest behaviour (blink, head turn toward the pointer) as in Part 2.
-- In the Talk to the owl section it perches beside the "Talk to Hoot" button, and clicking it opens the chat, as today.
-- Product pages: a small perched owl replaces the floating chat button and opens Hoot. No flight there.
-- Keep from Part 2: header clearance of at least 12px, a steady body size, and an anchor drift of at most 2px between frames.
-
-## Product pages
-- `elogbook.html` and `arogya.html` use the same header, logo, fonts and colours as the landing page, scroll normally, and link back to the landing page.
-- Use the copy above exactly. Keep the disclaimers. Keep the six-screen preview with its tabs, keyboard behaviour and expand dialog on the ELogBook page.
-
-## Design gate — two directions first
-- Before building everything, mock up sections 1 and 2 in two directions at 1440x900 and 390x844, using the design-taste-frontend skill if available:
-  - A — Calm and airy: cream and white, large confident type, soft green gradients, faint leaf texture, generous space.
-  - B — Deep green immersive: dark green full-bleed sections, soft glow accents, the green owl and logo lit against it.
-- Use the real logo and the owl sprite in both. Save the screenshots in the scratchpad, not the repo, show them to the developer and halt. Record the choice under `## Blocked on developer input`, then build the whole site in that direction.
+- [x] Append to §9 Unplanned / Ad-hoc Work, matching the existing bullet format: `- 2026-11-03 — Vercel publish hygiene: a root `.vercelignore` keeps internal project files (governance, docs, dev tools, reference material, local server) off the live site at gothoslabs.com. Site files unchanged.` Append only; do not edit or renumber any section.
 
 ## Files/areas in scope
-- `index.html` — rewrite the landing page into the six sections.
-- `elogbook.html`, `arogya.html` — new product pages.
-- `styles.css` — landing and shared styles.
-- `product-page.css` — new, shared product-page styles.
-- `section-scroll.js` — rewrite as the section transition engine.
-- `owl.js` — perches per section, flight synced to transitions, product-page perch; remove the read-fade and tall-section logic.
-- `site.js` — move preview handlers to the ELogBook page, keep the form and motion control; remove handlers for removed markup.
-- `logbook-showcase.css`, `logbook-showcase.js`, `product-preview.css` — as the ELogBook page needs.
-- `owl-chat.css` — owl, perch and avatar rules.
-- `chat.js` — only `fly`, `avatar`, `stopTransfer` and `avatarDestination`, and only if perch or layout changes require it.
-- `assets/screens/elogbook-preview.webp`, `assets/screens/arogya-preview.webp` — new illustrative snapshots, captured from the local preview, with no personal data.
-- `README.md`, `DESIGN.md`, `PRODUCT.md` — new structure, pages and transitions.
-- `docs/MASTER_PLAN.md`, `HANDOFF.md`, `.agents/CURRENT_TASK.md`.
+- `.vercelignore` (new, repo root): ignore exactly these paths, one per line, gitignore syntax:
+  - `.agents/`
+  - `docs/`
+  - `tools/`
+  - `reference-source/`
+  - `HANDOFF.md`
+  - `DESIGN.md`
+  - `PRODUCT.md`
+  - `README.md`
+  - `REFERENCE.md`
+  - `server.mjs`
+  - `.gitignore`
+  - `.gitattributes`
+- `docs/MASTER_PLAN.md`: the §9 append above, and nothing else.
+- `REFERENCE.md` lines 42–43: Manual (developer), see below. Written by the developer, committed with this task.
 
 ## Explicitly out of scope
-- Chat conversation, routing and medical-refusal code, and Hoot's replies.
-- Delivering enquiries or adding contact details.
-- New runtime dependencies or frameworks; the site stays buildless.
-- Regenerating owl art. An upscaled sheet may be swapped in by rerunning the script.
-- PR, merge to main, deployment or DNS.
+- `vercel.json`, redirects, headers, caching, clean URLs: not needed for a static site with preset Other.
+- Deleting or moving any file, including unreferenced `fly.mp4`: a separate decision.
+- `package.json`: Vercel reads it; it contains nothing sensitive. Do not ignore it.
+- `licenses/`: the font licences must ship with the fonts. Do not ignore it.
+- Any Vercel dashboard, Spaceship or DNS change: developer only (§5.4, §9).
+- Any change to page HTML, CSS, JS, `assets/` or `fonts/`.
 
 ## Do NOT touch
-- `server.mjs`, `package.json`, `fonts/`, `licenses/`, `fly.mp4`, `assets/logo/`, `assets/owl/source/`.
-- `chat.js` outside the four avatar functions.
-- `.agents/AGENTS.md`, root `AGENTS.md`, root `CLAUDE.md`, the nested `Gothos-labs/` folder, `.claude/`, `.playwright-mcp/`, `show-*.jpg`, `.agents/owl-contact-sheet.png`. Never stage them.
-- `docs/STATUS.md` until wording is approved at close-out.
-- Git trust settings, hooks, permissions and sandbox configuration; the local `feature/owl-redesign` branch; the preview server on port 4177.
+- Every file the pages load: `index.html`, `elogbook.html`, `arogya.html`, all root `*.css` and `*.js`, `assets/`, `fonts/`, `licenses/`.
+- `.agents/AGENTS.md` (modified, uncommitted on purpose) and the untracked items listed by the last close-out (`.agents/owl-contact-sheet.png`, `.claude/`, `.playwright-mcp/`, `Gothos-labs/`, root `AGENTS.md` and `CLAUDE.md`, `show-*.jpg`, `tools/__pycache__/`, `.agents/runs/out-v*.json`, `smoke.mjs`, `scroll-shots.mjs`).
+- `main`: never commit to it directly, never merge.
+- The guard hook and its allow list.
 
 ## Execution route
 - B — Agent loop.
-- Why: route C test point 1 fails; design, motion and layout need judgement and browser checks.
-- Close-out: route B, never route C.
+- Why: route C test point 2 fails. Deployment config is a §10 high-assurance trigger.
+- Close-out: route B via `close-task`. Never route C. Push of `vercel-publish` and a PR to `main` on `Gotham28/gothos_labs` are authorized by the developer for this task ("Yes, scope it", 2026-11-03, after the go-live instructions; repo per "Move to Gotham28 entirely"). No push to `x3O8/Gothos-labs`. No force push by the agent. Merge stays with the developer.
 
 ## Manual (developer does)
-- [ ] Pick design direction A or B from the mockups.
-- [ ] Remove the old owl art, which nothing references now: `git rm assets/owl/hoot-body.png assets/owl/hoot-torso.png assets/owl/hoot-wing.png`
-- [ ] Delete clutter the guard stops agents removing: `rm -r .playwright-mcp show-*.jpg`
-- [ ] Keep a permanent copy of the owl sheet; optionally hand over a 3x upscale.
-- [ ] Accept or send back the combined review; approve STATUS wording.
-- [ ] Tell the repo owner that `transfer.json` exposed a signed download link and completion token in a public repo.
+- [x] Move this folder to `Gotham28/gothos_labs`, keeping full history. Run in `D:\Company Website`:
+  1. `git remote rename origin x3o8` (keeps the old repo reachable for reference)
+  2. `git remote add origin https://github.com/Gotham28/gothos_labs.git`
+  3. `git fetch origin` and `git fetch x3o8`
+  4. `git push --force-with-lease=main:bab69aa origin refs/remotes/x3o8/main:refs/heads/main` (a one-time force push that replaces the "Initial commit" with the real history; the files are identical, so nothing is lost; it refuses if anyone has pushed to `Gotham28` `main` since `bab69aa`)
+  5. `git branch -u origin/main main` if a local `main` exists
+  Vercel redeploys the same files; the site keeps returning 404 until this task merges.
+- [ ] Edit `REFERENCE.md` lines 42–43 by hand (the guard blocks the agent): replace the two `hoot-body.png` / `hoot-wing.png` lines with `- Superseded: the owl now uses the sprite atlas `assets/owl/owl-atlas.webp` / `owl-atlas.json` (built by `tools/build-owl-atlas.py`).` Or tell the execution session to leave the file as it is.
+- [ ] Delete `.agents/commit-msg.txt` (close-out scratch file).
+- [x] The go-live clicks, separately and at any time: Vercel import (preset Other), add `gothoslabs.com` and `www.gothoslabs.com`, then in Spaceship Advanced DNS remove the two parking A records and add Vercel's A (`@`) and CNAME (`www`).
+- [ ] After review: merge the PR into `main`.
 
 ## Agent (does on its own, once scope is confirmed)
-- [x] Confirm the branch, that origin is still eb3f346c, and that the earlier parts' changes are present.
-- [x] Build the two design mockups and halt for the developer's pick. (Direction A chosen.)
-- [x] Build the six sections, the transition engine, the owl perches and flights, and both product pages in the chosen direction.
-- [x] Capture the two illustrative snapshots.
-- [x] Run every check below; update docs, MASTER_PLAN §9 and HANDOFF.md (Part 3); stop for the combined review. (Evidence and gaps are in HANDOFF.md Part 3; the Part 2 video comparison could not be done.)
+- [x] First check that `git remote get-url origin` is `https://github.com/Gotham28/gothos_labs.git` and that `origin/main` contains `e554503`. If not, halt: the Manual repo move isn't done.
+- [x] Create branch `vercel-publish` from `origin/main`. Carry the uncommitted working-tree items over untouched.
+- [x] Write `.vercelignore` with exactly the listed paths. (Created by the developer by hand after the guard blocked the agent; verified to hold exactly the 12 paths.)
+- [x] Append the §9 entry to `docs/MASTER_PLAN.md`.
+- [x] Run the local verification below and write evidence into root `HANDOFF.md` (replace the previous task's content; it is preserved in git at `5d2b9c2`).
 
 ## Blocked on developer input
-- Design direction resolved 2026-11-02: Direction A (calm and airy) chosen by the developer in the execution session; mockups were in the scratchpad.
-- **Close-out 2026-11-03 — nothing staged or committed until these are answered:**
-  1. **PR.** This file authorizes only the push to `origin bird-updated`; it says "No PR or merge" and lists PR as out of scope. Authorize a PR to `main` on x3O8/Gothos-labs? (Merge is never done by close-task.)
-  2. **STATUS.md wording.** Approve or correct the draft below. It is HANDOFF.md's Fix round 3 draft, with: date 2026-11-03, `PR`/`Commits` as literal `pending`, a Review line, and verification as commands plus counts (copied from HANDOFF.md; not re-run in close-out). Also change `Last updated: 2026-10-28` to `2026-11-03`.
-  3. **Paths outside the literal scope list.** Recommended to include: `assets/logo/gothos-logo.png`; `assets/owl/owl-atlas.webp`, `assets/owl/owl-atlas.json`, `assets/owl/source/owl-sheet.webp`; `tools/build-owl-atlas.py` (not `tools/__pycache__/`); the developer's already-staged deletions (`assets/owl/hoot-body.png`, `hoot-torso.png`, `hoot-wing.png`, and `.owl-reference-tools/*`); and dev tooling `.agents/runs/run.mjs`, `v1-core.mjs` … `v6-mode.mjs` (not `out-v*.json`, `smoke.mjs`, `scroll-shots.mjs`).
-  4. **Stale line outside STATUS.md:** `REFERENCE.md` lines 42–43 list `assets/owl/hoot-body.png` and `hoot-wing.png`, which the commit deletes. Fold a one-line fix into this commit, do it separately, or leave it?
-- Left unstaged regardless: `.agents/AGENTS.md` (modified, "Do NOT touch"), `.agents/owl-contact-sheet.png`, `.claude/`, `.playwright-mcp/`, `Gothos-labs/`, root `AGENTS.md`, root `CLAUDE.md`, `show-1-hero.jpg` … `show-12-landing-talk.jpg`, `tools/__pycache__/`, `.agents/runs/out-v*.json`, `.agents/runs/smoke.mjs`, `.agents/runs/scroll-shots.mjs`.
-- Draft STATUS entry (not applied):
-```
-### Catch-up — 2026-11-03
-Rebuilt the landing page as six full-screen sections with a section-transition
-engine and an owl that perches in each section and flies between them; added
-ELogBook and AROGYA product pages; real Gothos Labs logo; 16-pose sprite owl.
-- Landing: Gothos Labs hero, What we do, ELogBook, AROGYA, Ask the owl (Hoot),
-  Talk to us (local-brief enquiry form). One gesture moves one section. The
-  section deck runs from 360x640 up where every section fits; on shorter or
-  narrower screens, or when a section stops fitting, the page scrolls normally.
-  Header links, dots and #what-we-do, #elogbook, #arogya, #owl, #contact deep
-  links work in both modes.
-- elogbook.html (six-screen illustrative preview, role tabs) and arogya.html
-  (illustrative chat card, disclaimer, disabled live-demo button), each with a
-  small perched owl that opens Hoot.
-- Copy: developer-supplied; the "What we do" wording is a developer-approved draft.
-- Branch: bird-updated
-- PR: pending            (N/A if no PR is authorized)
-- Commits: pending
-- Review: one combined High-assurance independent review; Fix round 3 accepted
-  by the developer 2026-11-03 after two send-backs. Tier unratcheted (no
-  independent Antigravity tier for a direct-executor task, AGENTS.md §12.9).
-- Verification (HANDOFF.md, Fix round 3, run after the last source edit):
-  - for f in section-scroll.js owl.js site.js chat.js logbook-showcase.js; do node --check "$f"; done -> all five OK
-  - node .agents/runs/run.mjs .agents/runs/v1-core.mjs  -> 72 rows, 68 PASS, 0 FAIL
-  - ... v2-fit.mjs   -> 60 section/size runs, 0 failing
-  - ... v3-owl.mjs   -> 70 flights, 9182 frames, 0 outside viewport, 0 hidden
-  - ... v4-input.mjs -> 56 rows, 45 PASS, 0 FAIL
-  - ... v5-pages.mjs -> 61 rows, 60 PASS, 0 FAIL
-  - ... v6-mode.mjs  -> 69 rows, 62 PASS, 0 FAIL
-  - git ls-remote origin bird-updated -> eb3f346c256fa64a457349a4d5efaa06b16941bc
-  Full output: HANDOFF.md "Fix round 3". Scripts: .agents/runs/ (dev tooling).
-Notes / Open Questions
-- Part 2 video comparison: not done; waiver needed.
-- Not verified on real devices or browsers: touch, pull-to-refresh, trackpad
-  momentum, background tab, text-only zoom, phone toolbar resizes,
-  Safari/Firefox, screen readers.
-- Open review items: n6 (scroll-mode corner owl can sit over a footer link),
-  n7 (chat.js:97 selector matches nothing until a live-assistant URL is set),
-  n12 (?v=deck-3 cache-busting; openAssistant opens a new tab), n13 (one avatar
-  guard line in chat.js), and m1, m3-m5, m10, m14-m17, m19, m20 from the first review.
-- Hoot's scripted replies in chat.js still use "Arogya ELogBook" and
-  "Arogya Health Assistant"; the name-handling finding and
-  assistantVoiceVerified: true (site.js) are unverified; fly.mp4 is committed
-  although MASTER_PLAN §3 says the reference video is not.
-- The AROGYA live demo needs a real URL and frame-policy check (assistantUrl is empty).
-- transfer.json's signed link and token were exposed in a public repo: tell the repo
-  owner. (The staged deletion of .owl-reference-tools/ removes it from the tree, not
-  from git history.)
-```
+- RESOLVED 2026-11-03: the developer created `.vercelignore` by hand; execution finished and verified locally (see HANDOFF.md). Was: (execution session, §12.5/§7): the guard hook (`~/.claude/hooks/antigravity-guard.ps1`) blocked `Write` to `D:/Company Website/.vercelignore`, an in-scope path. It allows only `.agents/`, `docs/`, `HANDOFF.md`, so it does not yet allow direct-executor writes to the repo root. Nothing was routed around. Needs the developer to widen `$AllowedWritePatterns` for `.vercelignore` (and `HANDOFF.md` is already allowed), or to create `.vercelignore` by hand with the 12 listed paths. Done so far: branch `vercel-publish` from `origin/main` (`e554503`), §9 entry appended to `docs/MASTER_PLAN.md`. Not done: `.vercelignore`, the local verification, `HANDOFF.md` evidence.
+- Review 2026-11-03 (high assurance; four lenses): verdict accept with fixes. Developer decision: "Send back". Fix round 1 is docs-only: `HANDOFF.md` (M1 pasted unfiltered item-3 output, m1 counts 40 published files / 12 fonts, m2 stale line 14, m4 STATUS.md draft in HANDOFF with residual risks under Notes / Open Questions) and ticking completed boxes here (m3). No writes outside the repo or scratchpad (m5). Do not touch `.vercelignore` or any site file. Resume from Order step 2 (HANDOFF/verification only), then re-review at the same tier. Scope change approved by the developer ("Yes, amend it"): Verification item 3 reworded, preview probes add `/.vercelignore` and the `x-matched-path`/`x-vercel-id` headers, and close-out pushes with an explicit `git push -u origin vercel-publish`.
+- Re-review 2026-11-03 (high assurance; four lenses, after fix round 1): verdict accept with fixes. Earlier M1 and m1–m3 confirmed fixed. Two new Majors were in this task file's own checks, not the executor's work: the production redirect was the wrong way round, and there was no rule for Vercel preview login. Minors: no general halt rule, a PowerShell `curl` alias problem, the PR repo not pinned, and in `HANDOFF.md` a stale probe list, transient STATUS wording and the wrong direction at line 84. Developer decision: "Fix task file, then close out". The planning session amended Verification (probe rules, preview, production) and Order step 4. The work is accepted; next is `close-task` in a fresh Sonnet session. The HANDOFF-side minors are handled at close-out per Order step 4.
+- Original note, at scoping: none open. Likely halt: if the guard blocks writing `.vercelignore` or `docs/MASTER_PLAN.md`, stop and report the path (§7). Do not route around it.
 
 ## Order
 ### Steps inside this task
-1. Confirm the branch and state.
-2. Design gate: mockups, then halt for the developer's pick.
-3. Build the landing sections and transition engine.
-4. Owl perches and flights.
-5. Product pages and snapshots.
-6. All checks; docs; HANDOFF Part 3.
-7. One combined independent code-review at High assurance in an Opus session, covering Part 1, Fix round 1, Part 2 and this work; stop for the developer's decision.
-8. After acceptance, close-task commits only scoped files and pushes to `origin bird-updated` without force. Approval of this file authorizes that push. No PR or merge. If the remote moved from eb3f346c, halt.
+1. Developer does the repo move (Manual) before the execution session starts. The developer can also edit `REFERENCE.md` or say to leave it, any time before close-out.
+2. Agent: branch, `.vercelignore`, §9 append, local verification, HANDOFF.md.
+3. Independent `code-review` at the high-assurance tier, then a developer decision.
+4. `close-task`: commit the scoped files (`.vercelignore`, `docs/MASTER_PLAN.md`, `HANDOFF.md`, `REFERENCE.md` if edited, this file; never `.agents/AGENTS.md`), push with exactly `git push -u origin vercel-publish` (the branch tracks `origin/main`, so a bare `git push` must not be used), and open the PR with exactly `gh pr create --repo Gotham28/gothos_labs --base main --head vercel-publish`. Close-out also:
+   - Runs the preview and production probes from this file's Verification section, never from the older list in `HANDOFF.md` (around line 90).
+   - Rewrites the `HANDOFF.md` STATUS draft into durable, committed facts (commit hashes, PR number), puts residual risks only under Notes / Open Questions, writes the live 404 as a dated observation ("checked 2026-11-03: every path returned plain-text `Not found`"), hedges the Vercel CLI-vs-Git-deploy note, and gets the developer's approval before writing `docs/STATUS.md`.
+   - Ticks the MASTER_PLAN update box, the Manual repo-move box and the Manual go-live box (all done and verified).
+   - Expects the committed `.vercelignore` blob to be LF (`* text=auto`), so its size and md5 differ from the reviewed 142-byte CRLF working copy; compare the 12 lines, not the hash.
+5. Before merging: the preview checks below, run against the Vercel preview URL for the PR, if the Vercel project exists by then.
+6. Developer merges. Then the production checks below.
 
 ### Where this task sits
-- Before this: Part 1, Fix round 1 and Part 2, all built and unreviewed.
-- After this: the carried-over findings.
+- Before this: PR #2 merged (done, `e554503`).
+- After this: production checks at gothoslabs.com once DNS is live; a STATUS.md catch-up recording the merge and go-live, with wording approved by the developer.
 
 ## Verification required before this is considered done
-- [ ] `node --check` on every changed `.js` file; paste commands and output.
-- [ ] Landing page and both product pages load from 127.0.0.1:4177 with no console errors and no failed requests.
-- [ ] Copy check: every Approved copy line appears exactly where listed; paste output.
-- [ ] Section alignment: after every input type (wheel, trackpad-style burst of 30 wheel events, swipe at 390x844, each key, dot nav, header link, deep link, back/forward), the settled position equals a section boundary within 1px. Paste a table.
-- [ ] No skip: a burst of rapid wheel events moves exactly one section; input during a transition is ignored. Paste evidence.
-- [ ] Fit: screenshots of all six sections at 360x640, 390x844, 1280x720, 1366x768 and 1440x900, with no internal scroll and nothing clipped.
-- [ ] Owl: a frame-by-frame trace through all transitions forward and back shows the owl visible and inside the viewport on every frame, landing at each perch. Screenshots of every perch show nothing covered.
-- [ ] Owl sprite checks from Part 2: angle-change rate, turn order and anchor drift on the new paths.
-- [ ] Keyboard and focus: every key in the list, Tab across sections, focus lands on the section heading, and the form and chat inputs are not hijacked.
-- [ ] Reduced motion, Pause motion and hidden tab behave as specified.
-- [ ] Chat opens from the Talk to the owl section and the product-page owl, and closes and restores the owl.
-- [ ] Product pages: the ELogBook preview tabs, keyboard and expand dialog work; the AROGYA disclaimer and live-demo button are present; Request a demo and Talk to us reach the form.
-- [ ] Enquiry form still downloads a brief with the honest not-sent wording.
-- [ ] Part 2 checks never completed: phone trace, Pause/reduced-motion run, reverse run and the video comparison, now on the new layout.
-- [ ] `git status` and `git diff --stat` before commit — only scoped files changed.
+- [x] Local: `git ls-files | git -c core.excludesFile=.vercelignore check-ignore --no-index --stdin` lists every tracked file under the ignored paths and nothing else. Paste the output.
+- [x] Local: the same check against each file the pages load (`index.html`, `elogbook.html`, `arogya.html`, the root `*.css` and `*.js`, `assets/logo/gothos-logo.png`, `assets/owl/owl-atlas.webp`, `assets/owl/owl-atlas.json`, `assets/screens/*.webp`, `fonts/*`, `licenses/*`) prints nothing, so none of them is ignored. Paste the command and its empty output.
+- [x] Local (amended 2026-11-03 after review, M1): the unfiltered `git diff --stat origin/main` shows only `docs/MASTER_PLAN.md`, `HANDOFF.md`, `.agents/CURRENT_TASK.md`, `REFERENCE.md` if the developer edited it, and the pre-existing `.agents/AGENTS.md` change (named as pre-existing, never staged). Separately, `git status --short -- .vercelignore` shows `?? .vercelignore`. Paste both outputs, fresh and unfiltered.
+- Probe rules (amended 2026-11-03 after re-review, M1/M2/m1/m2; apply to both checks below):
+  - Command: in PowerShell use `curl.exe -s -o NUL -w "%{http_code}" <url>`; in Git Bash use `curl -s -o /dev/null -w "%{http_code}" <url>`. Never PowerShell's `curl` alias. Headers: `curl.exe -sI <base>/`. Record `x-matched-path` and `x-vercel-id` for information only; no decision depends on them.
+  - Expect 200: `/`, `/elogbook.html`, `/arogya.html`, `/assets/owl/owl-atlas.json`. Expect 404: `/HANDOFF.md`, `/.agents/AGENTS.md`, `/docs/STATUS.md`, `/server.mjs`. Report-only: `/.vercelignore` (report its code to the developer; never halt on it).
+  - Halt and report to the developer if any expected-200 probe returns anything other than 200 (including plain-text `Not found`, Vercel's own 404 page, 5xx or `FUNCTION_INVOCATION_FAILED`), or if any expected-404 probe returns 200. The fix is then a scoping question; do not edit `package.json`, `server.mjs` or Vercel settings.
+- [ ] Preview (at close-out, before merge, if the Vercel project exists): the probe rules against the PR's Vercel preview URL. If the preview answers 401 or 403 (Vercel Deployment Protection), record "preview not verifiable (Deployment Protection)", leave this box unticked, and do not use or ask for a bypass token. The production check right after the merge then becomes the gate; tell the developer so before they merge.
+- [ ] Production (after merge): the probe rules against `https://www.gothoslabs.com` (the main address). Also `http://gothoslabs.com/` and `https://gothoslabs.com/` must each return 308 with `Location` `https://www.gothoslabs.com/` (or 308 to `https://gothoslabs.com/` first for the http one, then 308 to www). Never "fix" the domain redirect; it is the developer's Vercel setting.
 
 ## Flags (AGENTS.md rule triggers)
-- §4 / §5.5: AROGYA and ELogBook claims are developer-supplied; the What we do wording is a draft approved with this plan. Add no claims. Keep the medical disclaimer.
-- §5.2: never name the Kerala hospital.
-- §5.3: architecture change — the landing page becomes a full-screen section deck with its own scroll engine, and two pages are added. Approval of this plan covers it.
-- Accessibility risk: replacing native scroll needs careful keyboard, focus and reduced-motion handling, as listed.
-- §5.4 / §9: push to bird-updated only after acceptance; no force, PR, merge or deployment.
-- §12.5 likely halts: design gate; a section that cannot fit at 360x640; a perch that cannot avoid content; the remote moved.
-- Rule conflict still open: `fly.mp4` is committed although MASTER_PLAN §3 says the reference video is never committed.
+- §5.4 / §9: deployment. This task changes what Vercel publishes. All Vercel and DNS actions stay with the developer; the agent makes no remote change beyond close-out's authorized push and PR.
+- §5.4 / §9: the repo move needs a one-time force push to `Gotham28/gothos_labs` `main`. The developer runs it by hand (Manual). `--force-with-lease` pinned to `bab69aa` stops it from overwriting anything new.
+- §5.7: `x3O8/Gothos-labs` becomes a separate, inactive boundary. Nothing is pushed there.
+- §5.8: the `REFERENCE.md` line fix is a separate docs correction. It rides along only as a developer-manual edit in the same commit, because the close-out already approved it and the guard blocks the agent.
+- §5.10: local evidence proves the ignore rules. Only the preview and production checks prove Vercel honours them.
+- §12.5: halt if the guard denies an in-scope write, or if a preview shows an ignored path still served.
+- §4 / §5.1: none. No content, claims or sensitive data change.
+- §9 append: lands without its own approval checkpoint (see the note in the hand-off).
 
 ## Suggested review tier (set at scoping time)
-- High assurance, high effort — public privacy and data-separation claims, a scroll-engine rewrite with accessibility risk, and three stacked unreviewed parts.
+- High assurance, high effort. §10 trigger: deployment. Rounded up despite the small diff, because a wrong ignore rule either publishes internal files or breaks the live site.
 
 ## Executor
-- Sonnet direct
-- Why: Antigravity test fails (2); design and motion need in-loop browser checks.
+- Direct (legacy label: Sonnet direct).
+- Why: Antigravity test point 1 fails. About 15 lines that need in-loop checks.
 - Antigravity model: n/a.
-- Execution session: a fresh agent session; Sonnet in Claude Code.
-
-## Fix round 2 (combined review: reject; developer: send back, 2026-11-02)
-- Executor: Sonnet direct, same task. Fix-only until the Criticals are closed and re-reviewed; no staging, commit, push or PR; no STATUS.md write.
-- Developer decisions, which override the lines above where they differ:
-  - Short or zoomed screens fall back to normal scrolling when a section's content does not fit or the viewport is short. This replaces "do not let it scroll" in the transition rules; the deck stays at the five listed sizes.
-  - Input during a move is ignored: dot and header clicks, back/forward and focus changes. When the move ends the screen re-syncs to the URL hash.
-  - Copy: "Bring ELogBook to your department" and "Bring AROGYA to your hospital" are approved. Removed: the What we do card, the "Hoot, our website guide" kicker and "Hoot gives no medical advice."
-- Open for the developer: waiver of the Part 2 video comparison.
-- Findings and fixes are recorded in HANDOFF.md, "Fix round 2".
-
-## Fix round 3 (re-review of Fix round 2: reject; developer: send back, 2026-11-03)
-- Executor: Sonnet direct, same task and rules as Fix round 2. Fix-only: no staging, commit, push or PR, no STATUS.md write. `chat.js`: avatar block and the four named functions only. The Fix round 2 developer decisions stand.
-- Scope of the round: the one Critical (the mode switch moved the page) and its Majors (stale owl size, screenshot height, content growth, URL and focus after a mode switch, scroll-mode link focus, the `.agents/runs/` scripts), plus the listed minors. Findings and fixes go in HANDOFF.md, "Fix round 3".
-
-## Acceptance (Fix round 3 review)
-- Accepted by the developer 2026-11-03: "Accepted, close it out". Close-out (close-task) started 2026-11-03 in a Sonnet session on branch `bird-updated`; origin `bird-updated` and HEAD both still at eb3f346c (`git ls-remote`).
-- Authorization on record: commit scoped files and push to `origin bird-updated`, no force (Order step 8). Merge, deployment and DNS are not authorized.
-- Close-out answers, relayed 2026-11-03 by the planning session as the developer's choices: (1) open a PR to `main` on x3O8/Gothos-labs, do not merge; (2) STATUS.md draft approved as drafted; (3) include the extra paths listed under Blocked on developer input, item 3; (4) fix `REFERENCE.md` lines 42–43 in this commit.
-
-## Owl art and sprite reference (from Part 2)
-- Source sheet: `assets/owl/source/owl-sheet.webp` (4x4: front, three-quarter, side and rear three-quarter; wings up, level and down; perched front, blink, perched three-quarter, take-off crouch). Rebuild with `tools/build-owl-atlas.py`.
-- Sprite rules: yaw follows travel, turns step through neighbouring angles, at most 4 angle changes per second, 80–120ms crossfades, about 1.4–1.6 wingbeats per second, bank capped at 10°, blink every 3.5–6s on the front perch.
-
-## Carried over from earlier tasks
-- The redesign task's independent review (2026-10-28) ended in reject / send back, and that work reached main through PR #1 without a recorded re-review. These items are not part of this task:
-- Critical: `chat.js` could accept unrecognized health statements as contact names and include them in local briefs, with a related medical routing bypass. A medical check now runs before name handling; whether that closes the finding is unverified.
-- Major: mobile ELogBook inner clipping and incomplete legibility evidence (`product-preview.css`, `HANDOFF.md`).
-- Major: `site.js` microphone delegation flag defaulted to true although live verification was not performed; URL empty, so not active. Current state unverified.
-- Full findings and fix-only prompt: `C:\Users\aravi\.codex\visualizations\2026\10\26\01a17990-0bda-7f40-89d2-8e001e3f7688\gothos-redesign-review.md`.
-- Deferred: a dedicated public demo URL. Do not guess it.
+- Execution session: a fresh Sonnet session in Claude Code.
 
 ## Approval
-- Status: APPROVED 2026-11-02 — planning session, including the What we do wording. Execute in a fresh agent session (Sonnet in Claude Code). First halt: the design gate.
+- Status: APPROVED 2026-11-03 — planning session, re-scoped for `Gotham28/gothos_labs`. Execute in a fresh agent session (Sonnet in Claude Code). Blocked on developer input: none open. The first agent step halts if the Manual repo move isn't done. The `REFERENCE.md` edit is a Manual item; if the developer hasn't made it by close-out, commit without it and leave it as a follow-up.
