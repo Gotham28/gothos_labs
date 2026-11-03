@@ -16,7 +16,6 @@
   // symmetric about it, so a mirror about the anchor never moves the head.
   const YAWS = ['front', 'quarter', 'side', 'rear'];
   const WINGS = ['up', 'level', 'down'];
-  const BEAT = [0, 1, 2, 1];             // wing cycle: up, level, down, level
   const FILL = .92;                      // widest pose spans this much of a 400 box
   const ATLAS = new URL('assets/owl/owl-atlas.json', document.baseURI);
   let atlas = null, K0 = 1, geo = null;
@@ -57,6 +56,12 @@
     const sprite = {
       key: '', mirror: false,
       show(key, mirror, ms = 0) {
+        // Pausing must finish an in-progress fade even if the pose is unchanged.
+        if (!site.motion.enabled) ms = 0;
+        if (!ms && animation) {
+          animation.cancel(); animation = null;
+          if (front >= 0) layers[(front + 1) % 2].style.opacity = '0';
+        }
         if (key === sprite.key && mirror === sprite.mirror) return;
         const frame = atlas.frames[key];
         if (!frame) return;
@@ -72,7 +77,7 @@
         if (!previous || !ms) { back.style.opacity = '0'; return; }
         back.style.opacity = '1';
         const run = animation = next.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms, easing: 'linear' });
-        run.onfinish = () => { if (animation === run) { back.style.opacity = '0'; animation = null; } };
+        run.onfinish = () => { if (animation === run) { back.style.opacity = '0'; animation = null; run.cancel(); } };
       }
     };
     return sprite;
@@ -99,8 +104,8 @@
   let chat = false;
   let wingSpread = 0, wingPhase = 0, airspeed = 0, bank = 0, wingCycles = 0, airSeconds = 0;
   // Pose state: ground (perched), crouch (take-off or landing), air (wingbeat).
-  let mode = 'ground', crouchLeft = 0, airTime = 0, facing = 1, svx = 0, svy = 0;
-  let yaw = 0, yawWant = 0, yawSince = 0, yawChanged = -9, lookTime = 0;
+  let mode = 'ground', facing = 1;
+  let yaw = 0, lookTime = 0;
   let size = 200, stops = [], paint = { x: 0, y: 0, s: 0, clampedY: 0 };
   const chatDialog = document.getElementById('chat-dialog');
   function syncChat() {
@@ -138,41 +143,33 @@
   function wingsAt(f) {
     return Math.min(ease(clamp(f / .22)), 1 - ease(clamp((f - .72) / .28)));
   }
-  // Which frame to show, from what the owl is doing. Yaw follows screen travel
-  // and turns one angle at a time (front, quarter, side, rear), at most four
-  // changes a second; the sprite crossfades each swap.
-  function pose(dt, u, motion) {
+  // Stage poses against the section's flight clock, rather than delayed speed
+  // thresholds. Hold a heading for the leg; climbing is not a turn away from us.
+  function pose(dt, u, motion, sample, from, to) {
     if (!motion || chat) {
-      mode = 'ground'; crouchLeft = 0; airTime = 0; yaw = yawWant = 0; lookTime = 0;
+      mode = 'ground'; yaw = 0; lookTime = 0;
       return ['perch', false, 0];
     }
-    if (mode === 'ground' && u > .18) { mode = 'crouch'; crouchLeft = .15; }
-    else if (mode === 'air' && u < .08) { mode = 'crouch'; crouchLeft = .15; }
-    if (mode === 'crouch') {
-      crouchLeft -= dt;
-      if (crouchLeft <= 0) { mode = u > .1 ? 'air' : 'ground'; airTime = 0; }
-    }
-    if (Math.abs(svx) > 12) facing = svx > 0 ? 1 : -1;
+    const flying = sample?.moving && from && to;
+    const f = flying ? sample.f : 1;
+    const nextMode = flying ? (f < .08 || f > .92 ? 'crouch' : 'air') : 'ground';
+    if (mode !== nextMode && nextMode === 'air') wingPhase = 0;
+    mode = nextMode;
+    if (flying && Math.abs(to.x - from.x) > 12) facing = to.x > from.x ? 1 : -1;
     if (mode === 'air') {
-      airTime += dt;
-      const travel = Math.hypot(svx, svy);
-      let want = 0;
-      if (airspeed > .08 && Math.abs(svx) > .35 * travel) {
-        const slope = svy / Math.abs(svx);
-        want = slope > .35 ? 1 : slope < -.35 ? 3 : 2;       // descending, climbing, level
-      }
-      if (want !== yawWant) { yawWant = want; yawSince = clock; }
-      if (yaw !== yawWant && clock - yawSince > .12 && clock - yawChanged >= .26) {
-        yaw += Math.sign(yawWant - yaw); yawChanged = clock;
-      }
+      const sideways = Math.abs(to.x - from.x) > 40;
+      yaw = sideways ? (f < .20 || f > .84 ? 0 : f < .36 || f > .70 ? 1 : 2) : 0;
       // 1.4 to 1.6 beats a second in the air, a little quicker at speed.
       const rate = 1.4 + .2 * clamp(airspeed * 6);
       wingCycles += dt * rate; airSeconds += dt;
       wingPhase = (wingPhase + dt * Math.PI * 2 * rate) % (Math.PI * 2);
-      return [`${YAWS[yaw]}-${WINGS[BEAT[Math.floor(wingPhase / (Math.PI * 2) * 4) % 4]]}`, facing < 0, 100];
+      // A brisk downstroke and longer recovery read better than equal holds.
+      const phase = wingPhase / (Math.PI * 2);
+      const wing = phase < .16 ? 0 : phase < .32 ? 1 : phase < .52 ? 2 : phase < .84 ? 1 : 0;
+      return [`${YAWS[yaw]}-${WINGS[wing]}`, facing < 0, 35];
     }
-    yaw = yawWant = 0; wingPhase = 0;
-    if (mode === 'crouch') return ['crouch', facing < 0, 70];
+    yaw = 0; wingPhase = 0;
+    if (mode === 'crouch') return ['crouch', facing < 0, 45];
     // Perched: blink now and then, and turn to a pointer held well to one side.
     lookTime = Math.abs(pointer.x) > .5 ? lookTime + dt : 0;
     if (lookTime > .6) return ['perch-quarter', pointer.x < 0, 100];
@@ -215,14 +212,12 @@
     // Bank follows actual sideways travel, so a return flight banks the other way.
     const speed = Math.hypot(vx, vy) / Math.max(1, innerHeight);
     airspeed = motion && !chat ? mix(airspeed, speed, 1 - Math.exp(-dt * 10)) : 0;
-    const mixV = 1 - Math.exp(-dt * 10);
-    svx = mix(svx, motion && !chat ? vx : 0, mixV); svy = mix(svy, motion && !chat ? vy : 0, mixV);
     bank = motion && !chat ? mix(bank, clamp(vx / innerWidth * 40, -10, 10), 1 - Math.exp(-dt * 7)) : 0;
     // Wings follow the leg: open from take-off, folded on a perch.
     let u = motion && !chat ? clamp(wings * (.82 + .18 * clamp(airspeed * 5))) : 0;
     wingSpread = !motion ? 0 : mix(wingSpread, u, 1 - Math.exp(-dt * (u > wingSpread ? 12 : 5)));
     u = wingSpread;
-    const [key, mirror, fade] = pose(dt, u, motion);
+    const [key, mirror, fade] = pose(dt, u, motion, sample, from, to);
     sprite.show(key, mirror, fade);
     layer.classList.add('is-ready');
     layer.classList.toggle('flying', !!(sample && sample.moving));   // no clicks on the owl while it crosses the page

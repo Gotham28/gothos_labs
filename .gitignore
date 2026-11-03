@@ -2,6 +2,8 @@ node_modules/
 dist/
 .env
 .env.*
+hoot.config.local.json
+enquiry.config.local.json
 !.env.example
 *.log
 *.pid

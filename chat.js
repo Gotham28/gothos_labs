@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   // Hoot: friendly, warm, concise; answers company questions, helps book a demo (collect name + email), handles support.
-  const CHAT_ENDPOINT = '';
+  const CHAT_ENDPOINT = '/api/chat';
   const site = window.Gothos;
   const dialog = document.getElementById('chat-dialog');
   const form = document.getElementById('chat-form');
@@ -79,7 +79,7 @@
   const REFUSAL = "I'm Gothos's website guide, so I can't give medical advice. Please speak to a doctor, or contact your local emergency services if it's urgent.";
   const GREETING = "Hi, I'm Hoot! How can I help you today?";
   const medical = text => /\b(symptoms?|pain|fever|cough|bleed\w*|medicine|medication|dosage|dose|diagnos\w*|treat\w*|emergenc\w*|suicid\w*|overdose|chest|breath\w*|stroke|pregnan\w*|prescri\w*|injur\w*|sick|illness|dizz\w*|nause\w*|vomit\w*|rash|antibiotic|insulin|tablet|pills?|paracetamol|ibuprofen|cancer|headache|migraine|diabet\w*|blood|glucose|cholesterol|heart|asthma|allerg\w*|infect\w*|fracture|covid|seizure|unconscious|faint\w*|wound|burns?|swollen|swelling|numb\w*|weakness|anxiety|anxious|depress\w*)\b|\b(should i take|can i take|stop taking|feel unwell|hurt\w*|health (advice|problem|question|issue|concern))\b|വേദന|മരുന്ന്|പനി/i.test(text);
-  let stage='idle', name='', epoch=0, pending=null, controller=null, history=[];
+  let stage='idle', name='', demoEmail='', demoId='', epoch=0, pending=null, controller=null, history=[];
   function message(text, user=false) {
     const bubble=document.createElement('p');
     bubble.className=user?'message message-user':'message message-bot';
@@ -115,7 +115,7 @@
   function open(trigger, assistant=false) {
     if(dialog.open)return;
     const origin = pageOwl.getBoundingClientRect();
-    cancelPending();stage='idle';name='';history=[];list.replaceChildren();input.value='';
+    cancelPending();stage='idle';name='';demoEmail='';demoId='';history=[];list.replaceChildren();input.value='';
     site.openDialog(dialog,trigger);document.body.classList.add('chat-open');
     dispatchEvent(new CustomEvent('gothos-chat',{detail:{open:true}}));
     avatar.style.visibility = 'hidden';
@@ -137,13 +137,13 @@
   async function send(raw) {
     const text=raw.trim().slice(0,1200);if(!text)return;
     cancelPending();message(text,true);input.value='';
-    // Medical intent always wins, even while collecting a name/email or using a future endpoint.
+    // Medical intent always wins, even while collecting a name/email.
     if(medical(text)){stage='idle';name='';reply(REFUSAL,()=>chips());return;}
     // Existing topic chips must navigate, never become a demo name or email.
     if (/^(What does Gothos build\?|Arogya Health Assistant|Maybe later|I need support)$/i.test(text)) { stage='idle';name=''; }
-    if(/^book a demo$/i.test(text)){stage='name';name='';reply("Happily! What's your name?");return;}
+    if(/^book a demo$/i.test(text)){stage='name';name='';demoEmail='';demoId='';reply("Happily! What's your name?");return;}
     if(stage!=='idle' && (/\?/.test(text)||/^(what|how|why|can|could|should|is|are|do|does|i (have|feel|am feeling))\b/i.test(text))) {
-      stage='idle';name='';reply(REFUSAL,()=>chips());return;
+      stage='idle';name='';
     }
     if(stage==='name') {
       if(text.length>80||!/[\p{L}]/u.test(text)){reply('Please use a short name, up to 80 characters.');return;}
@@ -151,40 +151,49 @@
     }
     if(stage==='email') {
       const probe=document.createElement('input');probe.type='email';probe.required=true;probe.value=text;
-      if(text.length>254||!probe.checkValidity()){reply('Please enter a valid email address so it can be included in your local brief.');return;}
-      site.downloadBrief({name,email:text,topic:'Book a demo',message:'I would like to discuss a demo of Gothos Labs products.'});
-      const thanks=`Thanks, ${name}. I can't send messages from this page yet, so I've prepared a short brief you can send to the team.`;
-      stage='idle';name='';reply(thanks,()=>chips());return;
+      if(text.length>254||!probe.checkValidity()){reply('Please enter a valid email address.');return;}
+      demoEmail=text;demoId=crypto.randomUUID();stage='confirm';
+      reply(`I can send a demo enquiry for ${name} at ${demoEmail}. Should I send it now? Reply yes or no.`);return;
     }
-    if(/arogya health|assistant|hospital chatbot/i.test(text)){reply('Arogya Health Assistant is our AI assistant for hospital websites and patient portals. It answers common hospital questions. Would you like to try the live demo?',()=>chips(true));return;}
-    if(/elogbook|e-?logbook|logbook/i.test(text)){reply('Arogya ELogBook is a logbook platform for medical training: case and procedure logs, postings and rotations, academic activities, assessments, and a printable logbook. Features depend on department configuration.',()=>chips());return;}
-    if(/what.*(build|gothos)|products|software|company|website|partnership|project|development|automation|\bAI\b/i.test(text)){reply('Gothos Labs builds AI products and software that help teams work smarter. Our products include Arogya ELogBook, a logbook platform for medical training, and Arogya Health Assistant, an AI assistant for hospital websites and patient portals.',()=>chips());return;}
-    if(/support|help.*(site|website|product)|not working|broken/i.test(text)){reply("I'm sorry you're stuck! Tell me what's going on and I'll point you in the right direction.",()=>chips());return;}
+    if(stage==='confirm') {
+      if(/^(no|no thanks|cancel)$/i.test(text)){stage='idle';name='';demoEmail='';demoId='';reply('No enquiry was sent. What else can I help with?',()=>chips());return;}
+      if(/^(yes|yes please|send|send it)$/i.test(text)){
+        const token=epoch;controller=new AbortController();typing.hidden=false;form.querySelector('button').disabled=true;
+        try {
+          await site.submitEnquiry({name,email:demoEmail,topic:'Book a demo',message:'I would like to discuss a demo of Gothos Labs products.',website:'',submissionId:demoId},controller.signal);
+          if(token!==epoch||!dialog.open)return;
+          stage='idle';name='';demoEmail='';demoId='';typing.hidden=true;
+          reply('Your demo enquiry was accepted for delivery. The team will need to confirm any booking.',()=>chips());
+        } catch(error) {
+          if(error.name!=='AbortError'&&token===epoch){typing.hidden=true;reply((error.message||'The enquiry could not be sent.')+' You can reply yes to try again, or no to cancel.');}
+        } finally {if(token===epoch)form.querySelector('button').disabled=false;}
+        return;
+      }
+      stage='idle';name='';demoEmail='';demoId='';
+    }
     if(/maybe later|no thanks/i.test(text)){reply('Of course. What else would you like to explore?',()=>chips());return;}
-    if(CHAT_ENDPOINT) {
-      const token=epoch;controller=new AbortController();typing.hidden=false;
+    {
+      const token=epoch;controller=new AbortController();typing.hidden=false;form.querySelector('button').disabled=true;
       history.push({role:'user',content:text});
       try{
         const response=await fetch(CHAT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-10)}),signal:controller.signal});
-        if(!response.ok)throw new Error('Unavailable');
-        const data=await response.json();if(token!==epoch||!dialog.open)return;
-        // Endpoint is deliberately unconfigured; clinical output must never become Hoot advice.
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(data.error || (response.status===404||response.status===405?'The local preview needs to be restarted.':'The guide is unavailable right now.'));
+        if(token!==epoch||!dialog.open)return;
         const answer=typeof data.reply==='string'?data.reply.slice(0,2000):'';
         typing.hidden=true;
-        if(!answer||medical(answer)){reply(REFUSAL,()=>chips());return;}
+        if(!answer){reply("I couldn't answer that just now. Please try again or use Talk to us.",()=>chips());return;}
         history.push({role:'assistant',content:answer});reply(answer,()=>chips());
-      }catch(error){if(error.name!=='AbortError'&&token===epoch){typing.hidden=true;reply("I couldn't reach the guide service. You can still explore these topics or prepare a local demo brief.",()=>chips());}}
+      }catch(error){if(error.name!=='AbortError'&&token===epoch){typing.hidden=true;reply(error.message||"I couldn't reach the guide. Please try again later or use Talk to us.",()=>chips());}}
+      finally { if(token===epoch) form.querySelector('button').disabled=false; }
       return;
     }
-    if(/^(hi|hello|hey|thanks|thank you)[!. ]*$/i.test(text)){reply('Happy to help. What would you like to explore about Gothos Labs?',()=>chips());return;}
-    // Unknown topics stay behind the same company-only boundary, including unfamiliar medical terms.
-    reply(REFUSAL,()=>chips());
   }
   form.addEventListener('submit',e=>{e.preventDefault();send(input.value);});
   document.querySelectorAll('[data-chat]').forEach(button=>button.addEventListener('click',()=>open(button,button.dataset.chat==='assistant')));
   dialog.addEventListener('close',()=>{
     stopTransfer(); avatar.style.visibility = '';
-    cancelPending();stage='idle';name='';history=[];input.value='';list.replaceChildren();
+    cancelPending();stage='idle';name='';demoEmail='';demoId='';history=[];input.value='';list.replaceChildren();
     document.body.classList.remove('chat-open');dispatchEvent(new CustomEvent('gothos-chat',{detail:{open:false}}));
   });
   site.chat={open,medical,animateClose};

@@ -6,7 +6,10 @@ HANDOFF.md
 DESIGN.md
 PRODUCT.md
 README.md
+EMAIL_SETUP.md
 REFERENCE.md
 server.mjs
 .gitignore
 .gitattributes
+hoot.config.local.json
+enquiry.config.local.json
