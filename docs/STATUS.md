@@ -8,6 +8,7 @@ Last updated: 2026-11-03
 - Existing buildless marketing website for Gothos Labs and Arogya ELogBook.
 - No website implementation changes are included in the bootstrap scope.
 - Enquiries prepare a local text brief; they do not send messages.
+- Repository: `Gotham28/gothos_labs` (private; Vercel deploys `main`) since 2026-11-03. `x3O8/Gothos-labs` is no longer updated.
 
 ## Catch-up log
 
@@ -60,6 +61,23 @@ ELogBook and AROGYA product pages; real Gothos Labs logo; 16-pose sprite owl.
   - ... v6-mode.mjs  -> 69 rows, 62 PASS, 0 FAIL
   - git ls-remote origin bird-updated -> eb3f346c256fa64a457349a4d5efaa06b16941bc
   Full output: HANDOFF.md "Fix round 3". Scripts: .agents/runs/ (dev tooling).
+
+### Catch-up — 2026-11-03 (hosting)
+Moved the project to `Gotham28/gothos_labs` and added a root `.vercelignore` so Vercel publishes only the public site.
+- Repository: the developer force-pushed the full history to `Gotham28/gothos_labs` `main`, replacing its single "Initial commit" (`bab69aa`); the tree was identical to `x3O8/Gothos-labs` `main` at `e554503` (PR #2 there, merged 2026-11-03).
+- Domain, checked 2026-11-03: `gothoslabs.com` DNS and HTTPS live; `www.gothoslabs.com` is the main address and the apex redirects to it (308). On the same day, before this change, every path on `www.gothoslabs.com` and `gothoslabs.vercel.app` returned plain-text `Not found`, matching what `server.mjs` sends.
+- Change: new root `.vercelignore` with 12 paths (`.agents/`, `docs/`, `tools/`, `reference-source/`, `HANDOFF.md`, `DESIGN.md`, `PRODUCT.md`, `README.md`, `REFERENCE.md`, `server.mjs`, `.gitignore`, `.gitattributes`); one-line MASTER_PLAN.md §9 entry. No page, style, script, asset or font file changed.
+- Branch: vercel-publish
+- PR: #1 https://github.com/Gotham28/gothos_labs/pull/1
+- Commits: 36e7a10, plus the docs commit that records this entry
+- Review: high assurance, four lenses; one send-back (fix round 1) and a re-review; accepted by the developer 2026-11-03. Tier unratcheted (no independent Antigravity tier for a direct-executor task, AGENTS.md §12.9).
+- Verification (HANDOFF.md, local only):
+  - `git ls-files | git -c core.excludesFile=.vercelignore check-ignore --no-index --stdin` -> 23 tracked files, exactly the files under the 12 paths.
+  - Same check over every file the pages load, plus `package.json` -> empty output (none ignored).
+  - `git diff --stat origin/main` -> only `docs/MASTER_PLAN.md`, `HANDOFF.md`, `.agents/CURRENT_TASK.md` and the pre-existing, unstaged `.agents/AGENTS.md`; `.vercelignore` is new.
+  - Local checks prove the ignore rules only. The Vercel preview and production probe results are recorded in the later go-live entry.
+- Deferred: preview and production probes; unreferenced files still published (see Notes); REFERENCE.md lines 42-43 (existing note).
+
 Notes / Open Questions
 - Part 2 video comparison: not done; waiver needed.
 - Not verified on real devices or browsers: touch, pull-to-refresh, trackpad
@@ -79,5 +97,10 @@ Notes / Open Questions
   from git history.)
 - REFERENCE.md lines 42-43 still list the deleted assets/owl/hoot-body.png and
   hoot-wing.png; the close-out session could not edit that file (write guard).
+- Not yet confirmed that Vercel honours `.vercelignore` and serves the site as static files; the preview and production probes in CURRENT_TASK.md settle it.
+- `package.json` `start` still runs `node server.mjs`. If Vercel runs it, `/` may keep returning `Not found`; the fix would be a scoping question.
+- `/.vercelignore` itself may be served; it lists path names only.
+- Files no page references (`git grep` over tracked `*.html`, `*.css`, `*.js`) are still published: `fly.mp4`, the manrope and open-sauce-one fonts (6 files), `assets/owl/source/owl-sheet.webp`, `assets/logo/gothos-owl.svg`, `assets/logbook/training-flow.svg`, `assets/logbook/training-reflection.svg`. Ignore or delete is undecided.
+- Expected, not tested here: Vercel Git deploys see only committed files, while CLI deploys upload the working directory, so untracked root items (`Gothos-labs/`, `show-*.jpg`, `.playwright-mcp/`, root `AGENTS.md` and `CLAUDE.md`) would not be covered by `.vercelignore` in a CLI deploy.
 
 

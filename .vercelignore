@@ -1,0 +1,12 @@
+.agents/
+docs/
+tools/
+reference-source/
+HANDOFF.md
+DESIGN.md
+PRODUCT.md
+README.md
+REFERENCE.md
+server.mjs
+.gitignore
+.gitattributes
