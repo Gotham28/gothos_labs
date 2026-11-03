@@ -45,8 +45,8 @@ ELogBook and AROGYA product pages; real Gothos Labs logo; 16-pose sprite owl.
   small perched owl that opens Hoot.
 - Copy: developer-supplied; the "What we do" wording is a developer-approved draft.
 - Branch: bird-updated
-- PR: pending
-- Commits: pending
+- PR: #2 https://github.com/x3O8/Gothos-labs/pull/2
+- Commits: 350c524, plus the docs commit that records this line
 - Review: one combined High-assurance independent review; Fix round 3 accepted
   by the developer 2026-11-03 after two send-backs. Tier unratcheted (no
   independent Antigravity tier for a direct-executor task, AGENTS.md §12.9).
