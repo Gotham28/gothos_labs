@@ -1,0 +1,26 @@
+/* ELogBook page: role tabs, features, and the illustrative interface preview. */
+.story-block h3{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--forest);margin-bottom:12px}
+.story-block p{font-size:15px;line-height:1.75;color:var(--muted)}
+.story-block strong{font-weight:600;color:var(--ink)}
+.role-workspace{min-width:0;border:1px solid #bed0c0;border-radius:16px;background:#f9faf6;box-shadow:0 14px 35px #234c2f08;overflow:hidden;max-width:560px}
+.role-tabs{display:flex;gap:5px;padding:10px;background:#e1eae1;border-bottom:1px solid #c4d5c7}
+.role-tabs button{flex:1;border:0;background:transparent;border-radius:8px;font-size:12px;padding:11px 6px;color:var(--muted)}
+.role-tabs button[aria-selected=true]{background:var(--forest);color:#fff;box-shadow:0 3px 8px #173c2c15}
+.role-tabs button:hover:not([aria-selected=true]){background:#d1dfd2}
+#role-panel{padding:20px;display:flex;gap:14px;align-items:flex-start;min-height:132px}
+#role-panel p{font-size:14px;line-height:1.75;color:var(--muted)}
+#role-panel strong{font-weight:600;color:var(--ink)}
+.role-icon{width:38px;height:42px;border:1px solid #bfd1c2;background:#e7eee3;border-radius:10px;display:grid;place-items:center;color:var(--forest);flex:none}
+.feature-list{list-style:none;margin:0;padding:0;max-width:560px}
+.feature-list li{position:relative;padding:10px 0 10px 22px;border-bottom:1px solid #d3e0d5;font-size:14.5px;line-height:1.6;color:var(--ink)}
+.feature-list li::before{content:'';position:absolute;left:2px;top:19px;width:7px;height:7px;border-radius:50%;background:var(--emerald)}
+.story-preview{min-width:0;position:relative}
+.story-preview #product-preview{max-width:1000px;margin-inline:auto}
+.workspace-foot{display:flex;align-items:center;justify-content:center;gap:12px;font-size:12px;color:var(--muted);margin:16px 4px 0}
+.preview-dialog .product-window{background:#f5f9f5}.preview-dialog .elog-nav button{font-size:11px}.preview-dialog .elog-eyebrow{font-size:9px}.preview-dialog .elog-welcome p,.preview-dialog .elog-insights p,.preview-dialog .elog-list-intro p{font-size:12px}.preview-dialog .elog-targets>div{font-size:10px}.preview-dialog .elog-targets>div span:last-child{font-size:9px}.preview-dialog .elog-category-grid strong{font-size:11px}.preview-dialog .elog-category-grid span{font-size:10px}
+@media(max-width:759px){
+ .story-preview .elog-app{grid-template-columns:minmax(0,1fr)}.story-preview .elog-sidebar,.story-preview .elog-main,.story-preview .product-window{min-width:0}
+ .story-block p{font-size:14px}.feature-list li{font-size:14px}.role-tabs button{font-size:11px}
+ .preview-dialog .elog-targets,.story-preview .elog-targets{flex-wrap:wrap}.preview-dialog .elog-category-grid,.story-preview .elog-category-grid{grid-template-columns:1fr}.preview-dialog .elog-category-grid button,.story-preview .elog-category-grid button{display:grid;grid-template-columns:auto 1fr;column-gap:12px}.preview-dialog .elog-category-grid button>svg:first-child,.story-preview .elog-category-grid button>svg:first-child{grid-row:span 2}.preview-dialog .elog-category-grid span,.story-preview .elog-category-grid span{grid-column:2}.preview-dialog .elog-empty strong{font-size:12px}.preview-dialog .elog-empty p{font-size:11px}
+ .story-preview .elog-welcome p,.story-preview .elog-insights p{font-size:11px;overflow-wrap:anywhere}.story-preview .elog-welcome-foot{overflow-wrap:anywhere}
+}

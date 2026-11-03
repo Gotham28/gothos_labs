@@ -8,7 +8,11 @@ Independent static marketing site. Buildless HTML, CSS, classic JavaScript, inli
 
 ## Product purpose
 
-Gothos Labs builds AI products and software. Arogya ELogBook is its flagship medical-training product. Arogya Health Assistant is a separate hospital/patient-facing assistant, and Hoot is only this website's company guide. “Arogya Health Assistant” is a working name pending final naming.
+Gothos Labs builds intelligent software. The site presents two products under the names the developer supplied: ELogBook, a digital logbook for postgraduate medical training, and AROGYA, a multilingual (English and Malayalam) AI assistant for hospitals. “Arogya ELogBook” and “Arogya Health Assistant” are no longer used in page copy, but Hoot's scripted replies in `chat.js` still say them; that wording is out of scope here and open for a later task. Hoot is only this website's company guide.
+
+## Approved site copy (developer-supplied 2026-11-02)
+
+The landing page hero (company name and one heading), the ELogBook page (headline, one-liner, problem, role lines, six features, pilot line, privacy line) and the AROGYA page (headline, one-liner, four points, proof line) use the developer's wording exactly. The landing-page ELogBook, AROGYA and Ask the owl sections use short intros condensed from that copy. The "What we do" section wording ("We bring AI to your software, so it works better." and its paragraph) is a draft the developer approved on 2026-11-02 from the direction "we bring AI to your software so it becomes better". The product-page headings "Bring ELogBook to your department" and "Bring AROGYA to your hospital" are approved. The Ask the owl section carries only the approved heading, line and button; it has no further Hoot copy. Developer decisions recorded with it: WhatsApp, booking confirmations and WhatsApp reminders are live; the Kerala hospital has agreed to the line “In live use at a hospital in Kerala.”, and that hospital is never named; the data-separation statement (“a hospital's data never appears in another hospital's answers”) is the developer's wording and must not be strengthened or extended. The earlier code-check caution that WhatsApp is not advertised is superseded by these decisions for the site copy; the evidence notes below are historical. The section disclaimer is unchanged.
 
 ## Product Evidence: Arogya ELogBook
 
@@ -53,7 +57,7 @@ Both enquiry paths download a local text brief with honest not-sent/not-booked w
 
 ## Brand and constraints
 
-Green/white identity, Poppins, sage shapes, numbered sections and native reversible scroll flight. The developer's latest appearance instruction replaces the flat mascot with a realistic dimensional, leaf-feather owl matching the video. The original flat company mark remains in navigation and at the final lockup, without the reference-sheet caption. The supplied video is reference material only and is not committed.
+Green/white identity ("calm and airy"), Poppins, sage shapes, six full-screen sections and an owl that flies between per-section perches during each transition. The developer's latest appearance instruction replaces the flat mascot with a realistic dimensional, leaf-feather owl matching the video. The real Gothos Labs logo mark (assets/logo/gothos-logo.png, cropped from the developer-supplied image) is used in navigation, the favicon and the AROGYA card. The supplied video is reference material only and is not committed.
 
 No invented metrics, testimonials, prices, customer/hospital endorsements, languages beyond source evidence, certifications or ELogBook AI features. Product applications, databases and personal records remain outside this repository.
 

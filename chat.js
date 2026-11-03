@@ -15,43 +15,60 @@
   avatar.className = 'chat-owl-avatar';
   avatar.setAttribute('aria-hidden', 'true');
   avatarImage.replaceWith(avatar);
+  // The avatar is the perched front frame, a 400px sprite box scaled so the
+  // owl fills the 64px header slot (the slot sits 11px in, 13px down).
+  const AVATAR_SLOT = {left:11,top:13,size:64};
+  let avatarSprite = null;
+  site.sprite.ready.then(() => {
+    if (!site.sprite.frames) return;      // atlas failed to load: the header keeps no avatar
+    const box = site.sprite.boxFor('perch', AVATAR_SLOT);
+    avatar.style.transform = `translate(${box.left}px,${box.top}px) scale(${box.width/400})`;
+    const host = document.createElement('span');
+    host.className = 'owl-sprite'; avatar.replaceChildren(host);
+    avatarSprite = site.sprite.create(host); avatarSprite.show('perch', false);
+  });
   let transfer = null;
   function stopTransfer() {
     if (!transfer) return;
     transfer.animation.cancel(); transfer.element.remove(); transfer = null;
   }
+  // Take-off crouch, one wingbeat (up, level, down, level), landing crouch, then
+  // the perched frame the header avatar shows.
+  const FLIGHT = [[0,'crouch'],[.12,'front-up'],[.28,'front-level'],[.44,'front-down'],[.62,'front-level'],[.78,'crouch'],[.9,'perch']];
   function fly(from, to) {
     stopTransfer();
-
+    if (!site.motion.enabled || !site.sprite.frames) return Promise.resolve();
     const element = document.createElement('div');
     element.className = 'chat-owl-transfer';
-    const svg = pageOwl.querySelector('svg').cloneNode(true);
-    const left = svg.querySelector('#wingL'), right = svg.querySelector('#wingR');
-    left.style.transformOrigin = '148px 170px'; right.style.transformOrigin = '310px 170px';
-    // Isolate SVG resource IDs from the live character's rig.
-    const ids = [...svg.querySelectorAll('[id]')].map(el => el.id);
-    let markup = svg.outerHTML;
-    ids.sort((a,b) => b.length-a.length).forEach(id => {
-      markup = markup.replaceAll('id="'+id+'"', 'id="transfer-'+id+'"')
-        .replaceAll('#'+id+'"', '#transfer-'+id+'"')
-        .replaceAll('#'+id+')', '#transfer-'+id+')');
-    });
-    avatar.innerHTML = markup.replaceAll('transfer-', 'avatar-');
-    if (!site.motion.enabled) return Promise.resolve();
-    element.innerHTML = markup; dialog.append(element);
+    const host = document.createElement('span');
+    host.className = 'owl-sprite'; element.append(host);
+    const clone = site.sprite.create(host);
+    const start = site.flight.pose();
+    clone.show(start.key, start.mirror);
+    dialog.append(element);
     const pose = rect => `translate(${rect.left}px,${rect.top}px) scale(${rect.width/400})`;
     const animation = element.animate([
       {transform:pose(from)},
+      {transform:pose({left:(from.left+to.left)/2,top:(from.top+to.top)/2-36,width:(from.width+to.width)/2}),offset:.5},
       {transform:pose(to)}
     ], {duration:620,easing:'cubic-bezier(.22,.75,.22,1)',fill:'forwards'});
     const current = transfer = {element,animation};
+    const play = () => {
+      if (transfer !== current) return;
+      const t = clamp01((animation.currentTime || 0) / 620);
+      clone.show(FLIGHT.filter(([at]) => t >= at).pop()[1], false, 50);
+      if (animation.playState === 'running') requestAnimationFrame(play);
+    };
+    requestAnimationFrame(play);
     return animation.finished.catch(() => {}).then(() => {
       element.remove(); if (transfer === current) transfer = null;
     });
   }
+  const clamp01 = n => Math.min(1, Math.max(0, n));
   function avatarDestination() {
     const panel = dialog.querySelector('.chat-panel');
-    return {left:panel.offsetLeft-panel.offsetWidth/2+12,top:panel.offsetTop+14,width:64};
+    const slot = {left:panel.offsetLeft-panel.offsetWidth/2+12,top:panel.offsetTop+14,size:64};
+    return site.sprite.frames ? site.sprite.boxFor('perch', slot) : {left:slot.left,top:slot.top,width:64};
   }
   function animateClose() {
     const from = transfer ? transfer.element.getBoundingClientRect() : avatar.getBoundingClientRect();
