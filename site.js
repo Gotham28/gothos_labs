@@ -84,15 +84,8 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { const open=menu.classList.contains('open');closeMenu();if(open)menuButton.focus(); } });
   document.addEventListener('click', e => { if(!e.target.closest('.site-header'))closeMenu(); });
   document.getElementById('year').textContent = new Date().getFullYear();
-  const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if(entry.isIntersecting){entry.target.classList.add('in');revealObserver.unobserve(entry.target);} });
-  }, { threshold:.3 });
-  document.querySelectorAll('.reveal').forEach((el,index) => { el.style.setProperty('--reveal-delay', ((index%3)*70)+'ms');revealObserver.observe(el); });
-  document.addEventListener('focusin', e => {
-    const target = e.target.closest('.reveal');
-    if (target) { target.style.transition = 'none'; target.classList.add('in'); }
-  });
-
+  // The interactive six-screen preview lives on elogbook.html only.
+  if (document.getElementById('elog-panel')) {
   const previewPanel = document.getElementById('elog-panel');
   const dashboardMarkup = previewPanel.innerHTML;
   const previewTabs = [...document.querySelectorAll('[data-preview-tab]')];
@@ -137,12 +130,16 @@
   });
   previewPanel.addEventListener('click',event=>{const button=event.target.closest('[data-preview-go]');if(button)showPreviewScreen(button.dataset.previewGo,true);});
   const previewDialog=document.getElementById('preview-dialog'), previewWindow=document.getElementById('product-window'), previewHome=document.getElementById('product-preview');
+  let previewTrigger=null;
   document.querySelectorAll('[data-expand-preview]').forEach(button=>button.addEventListener('click',event=>{
     if(previewDialog.open)return;
+    previewTrigger=event.currentTarget;
     document.getElementById('preview-dialog-host').append(previewWindow);
     site.openDialog(previewDialog,event.currentTarget);
   }));
-  previewDialog.addEventListener('close',()=>previewHome.append(previewWindow));
+  // The triggers live inside the window, so focus returns once it is back home.
+  previewDialog.addEventListener('close',()=>{previewHome.append(previewWindow);if(previewTrigger?.isConnected)previewTrigger.focus({preventScroll:true});});
+  }
 
   site.downloadBrief = ({name='', email='', topic='', message=''}) => {
     const line=value=>String(value).replace(/[\r\n]+/g,' ').slice(0,300);
@@ -151,31 +148,34 @@
     const anchor=document.createElement('a');anchor.href=url;anchor.download='gothos-labs-enquiry.txt';
     document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
   };
-  document.getElementById('enquiry-form').addEventListener('submit',event=>{
+  document.getElementById('enquiry-form')?.addEventListener('submit',event=>{
     event.preventDefault();const form=event.currentTarget;
     if(!form.reportValidity())return;
     const data=new FormData(form);site.downloadBrief({name:data.get('name'),email:data.get('email'),topic:data.get('topic'),message:data.get('message')});
     document.getElementById('form-status').textContent='Your local brief is ready. Nothing was sent.';
   });
 
+  // The illustrative AROGYA conversation plays once on arogya.html when it scrolls into view.
   const assistantItems=[...document.querySelectorAll('[data-sequence]')], assistantTyping=document.getElementById('assistant-typing');
-  let sequenceStarted=false, sequenceRunning=false, sequenceTime=0;
+  let sequenceStarted=false, sequenceRunning=false, sequenceTime=0, sequenceVisible=false;
   function renderSequence(){
     const thresholds=[0,.6,1.3,2.7];
     assistantItems.forEach((el,index)=>el.classList.toggle('shown',sequenceTime>=thresholds[index]));
-    assistantTyping.hidden=!(sequenceTime>=2&&sequenceTime<2.7);
+    if(assistantTyping)assistantTyping.hidden=!(sequenceTime>=2&&sequenceTime<2.7);
   }
   function finishSequence(){sequenceTime=3;sequenceRunning=false;renderSequence();}
-  const sectionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
-    entry.target.classList.toggle('is-visible',entry.isIntersecting);
-    if(entry.target.id==='assistant'&&entry.isIntersecting&&!sequenceStarted){
-      sequenceStarted=true;sequenceRunning=motion.enabled;
-      if(!motion.enabled)finishSequence();else{sequenceTime=0;renderSequence();site.flight?.request();}
-    }
-  }),{threshold:.15});
-  document.querySelectorAll('[data-flight-section]').forEach(section=>sectionObserver.observe(section));
+  const assistantCard=document.querySelector('.assistant-card');
+  if(assistantCard){
+    new IntersectionObserver(entries=>entries.forEach(entry=>{
+      sequenceVisible=entry.isIntersecting;
+      if(entry.isIntersecting&&!sequenceStarted){
+        sequenceStarted=true;sequenceRunning=motion.enabled;
+        if(!motion.enabled)finishSequence();else{sequenceTime=0;renderSequence();site.flight?.request();}
+      }
+    }),{threshold:.25}).observe(assistantCard);
+  }
   site.addTicker((_now,dt)=>{
-    if(!sequenceRunning||!document.getElementById('assistant').classList.contains('is-visible'))return;
+    if(!sequenceRunning||!sequenceVisible)return;
     sequenceTime+=dt;renderSequence();if(sequenceTime>=3)sequenceRunning=false;
   });
   function assistantURL(){
@@ -189,15 +189,18 @@
   site.openAssistant=trigger=>{
     const url=assistantURL();if(!url)return;
     if(!SITE_CONFIG.assistantFrameAllowed){window.open(url.href,'_blank','noopener,noreferrer');return;}
-    const host=document.getElementById('demo-host');host.replaceChildren();
-    const frame=document.createElement('iframe');frame.title='Arogya Health Assistant demo';frame.loading='lazy';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups');
+    const host=document.getElementById('demo-host'), dialog=document.getElementById('assistant-dialog');
+    // Pages without the demo dialog (the landing page) open the demo in a new tab.
+    if(!host||!dialog){window.open(url.href,'_blank','noopener,noreferrer');return;}
+    host.replaceChildren();
+    const frame=document.createElement('iframe');frame.title='AROGYA demo';frame.loading='lazy';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups');
     if(SITE_CONFIG.assistantVoiceVerified)frame.setAttribute('allow','microphone');
     frame.src=url.href;host.append(frame);
     document.getElementById('demo-new-tab').href=url.href;
-    site.openDialog(document.getElementById('assistant-dialog'),trigger);
+    site.openDialog(dialog,trigger);
   };
   document.querySelectorAll('[data-live-assistant]').forEach(button=>{site.configureAssistantButton(button);button.addEventListener('click',()=>site.openAssistant(button));});
-  document.getElementById('assistant-dialog').addEventListener('close',()=>document.getElementById('demo-host').replaceChildren());
+  document.getElementById('assistant-dialog')?.addEventListener('close',()=>document.getElementById('demo-host').replaceChildren());
   syncMotion();
 })();
 
