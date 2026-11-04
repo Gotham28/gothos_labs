@@ -141,3 +141,41 @@ Moved the project to `Gotham28/gothos_labs` and added a root `.vercelignore` so 
 
 ## Suggested review
 High assurance, high effort (§10, deployment trigger). Stated as unratcheted: no independent Antigravity tier exists for this direct-executor task (§12.9).
+
+## 2026-11-03 — Owl timing and ambient leaves
+
+User authorized fixes 1 and 2 in this chat and requested local-start instructions only; no server was started, no dependencies installed, and no deployment performed.
+
+- owl.js: stage take-off/landing against section transition progress, hold flight direction from perch endpoints, turn front/quarter/side/front instead of treating upward velocity as rear-facing, use asymmetric wingbeat holds, and shorten flight pose blending from 100ms to 35ms. Pausing settles active sprite fades; completed fades are released.
+- site.js / styles.css: create five decorative, aria-hidden leaves per landing section with staggered 15–21 second breeze cycles, small drift and rotation, and low opacity. Existing pause/reduced-motion and hidden-tab controls apply. Static background leaves remain when JavaScript is disabled.
+- Existing sprite art reused; no additional image frames generated. AI and enquiry behavior unchanged.
+
+Verification: node --check owl.js; node --check site.js; git diff --check — passed. A temporary Node VM check exercised the actual pose function for nine flights (left/right/vertical at 30/60/120 fps), validated pose names against the shipped atlas, checked take-off/landing and reduced-motion rest, and verified that pausing during an unchanged sprite pose cancels its active fade — passed.
+
+Limitations: no browser visual review or local HTTP server run, respecting the request not to start local hosting. Visual smoothness, leaf appearance, and mobile layout still need a browser check after the user starts the site. Node v22.16.0 is already installed on this machine; npm.cmd run dev starts the dependency-free preview at http://127.0.0.1:4177/.
+
+## 2026-11-03 — Stronger leaf breeze
+
+User requested visibly stronger background-leaf movement. styles.css now uses separate horizontal and vertical cycles offset by a quarter period, 48–68px horizontal travel, 40–64px vertical travel, stronger rotation, 9–14 second loops, and .22 opacity. Mobile leaf size is reduced slightly; motion controls remain shared.
+
+Verified actual stylesheet in headless Chrome with an isolated leaf fixture (no HTTP server): five leaves displaced 7.9–19.3px over one second at 1440px width, and 8.8–18.6px at 390px width. Both animations present; pause and hidden-tab styles paused them, and reduced motion removed animations. git diff --check passed. Full-site visual review remains pending; no local hosting or deployment started.
+
+## 2026-11-03 — Hoot AI implementation (local, unconfigured)
+
+User requested task 3 implementation with the model and API key in one editable local file, plus an editable knowledge document. Added `hoot.config.local.json` with empty `apiKey` and `model: gpt-4o-mini`; `.gitignore` and `.vercelignore` exclude the config. The config file was not staged or committed. On Vercel, one private `HOOT_CONFIG_JSON` environment variable carries the same JSON object. `HOOT_KNOWLEDGE.md` contains approved product and contact facts and can be edited directly.
+
+`hoot-api.mjs` validates short conversations, screens medical requests, reads the knowledge document, calls the Responses API with `store: false`, limits output and per-instance requests, and returns clear errors. `server.mjs` serves POST `/api/chat` locally and blocks the config and internal files from static GET; `api/chat.mjs` serves the same logic in Vercel, with `vercel.json` including the knowledge file. `chat.js` now sends company questions to the endpoint instead of keyword replies; its demo-brief collection remains honest and local. The three Hoot dialogs disclose external AI processing. No live key, provider call, email, server startup, or deployment occurred.
+
+Checks passed: Node syntax checks for chat.js, hoot-api.mjs, api/chat.mjs and server.mjs; `git diff --check`; `git check-ignore` confirms the local config is excluded. A mock provider test covered config, validation, knowledge in the prompt, model/key placement in the private request, medical refusal, provider failure, and `store: false`. A headless browser test loaded the product page with intercepted files and a fake `/api/chat` response, then confirmed Hoot sent the question and displayed the answer with no script errors. Live OpenAI quality, billing, and Vercel deployment remain unverified.
+
+## 2026-11-03 — Enquiry email delivery implementation
+
+User authorized implementing task 4 and asked for detailed account/domain steps. Added `enquiry-api.mjs`, local `POST /api/enquiry` in `server.mjs`, and Vercel `api/enquiry.mjs`, with the recipient fixed to `therealgautam2004@gmail.com`. The Resend key and verified-domain sender are read from Git-ignored `enquiry.config.local.json` locally or private `ENQUIRY_CONFIG_JSON` on Vercel. `.vercelignore` excludes the local config and setup guide. The endpoint validates fields, sends plain text with Reply-To, uses a client submission ID as Resend's idempotency key, applies a hidden-field spam check and per-instance rate limit, and returns errors without provider details. `site.js` submits the Talk to us form, keeps content on failure and reports acceptance only after provider confirmation. `chat.js` asks for explicit yes before sending a demo enquiry and reports acceptance after the endpoint confirms it. `HOOT_KNOWLEDGE.md` and README were updated to match. `EMAIL_SETUP.md` gives the owner's Resend, domain DNS, key, Vercel, local test, and inbox verification steps.
+
+Validation: `node --check` for enquiry-api.mjs, api/enquiry.mjs, server.mjs, site.js, chat.js passed; `git diff --check` passed; `git check-ignore enquiry.config.local.json` confirms the key file is ignored. Mock-provider tests covered invalid fields, missing config, fixed destination, Reply-To, idempotency header, provider failure, and honeypot. A headless browser test with intercepted site assets and mocked `/api/enquiry` checked form failure/retry/success and Hoot demo confirmation; no browser errors. The browser test used a synthetic secure origin for crypto.randomUUID. No local HTTP server, real Resend call, real email, deployment, or DNS change was performed. Live delivery requires the owner's private account setup and a real inbox test.
+
+## 2026-11-03 — Hoot local error diagnosis
+
+The user reported Hoot's generic failure on a local preview after adding an OpenAI key. Confirmed without revealing the key that `hoot.config.local.json` is valid JSON, contains an `apiKey`, and selects `gpt-4o-mini`. This workspace's direct provider call failed with `ENOTFOUND` before any HTTP response; that is the execution environment's network restriction and does not establish the user's local network condition. The local preview process could not be inspected from this workspace. An old preview process predating the `/api/chat` route is a plausible cause and needs a restart.
+
+Updated `hoot-api.mjs` to map provider key, quota, model, and network failures to safe specific messages. Updated `chat.js` to display endpoint errors and to identify 404/405 from an old preview process as a restart case. Syntax and diff checks passed. Mocked provider tests covered the four failure classes. A headless browser test with a synthetic 405 `/api/chat` response confirmed Hoot now says the local preview needs restarting. No real OpenAI response, deployment, or server start occurred.

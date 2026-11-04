@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/chat.mjs": {
+      "includeFiles": "HOOT_KNOWLEDGE.md"
+    }
+  }
+}
