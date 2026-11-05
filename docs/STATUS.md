@@ -108,7 +108,7 @@ Added canonical URLs and Open Graph metadata to the homepage and both product pa
 Notes / Open Questions: live indexing, ranking and external sharing previews have not been checked. No ranking guarantee.
 - Branch: `vercel-publish`
 - PR: N/A — local-only close-out; publication not authorized.
-- Commits: pending
+- Commits: `47e33f9afbb2bacc510cc62717b39e80b8805e5e` (SEO implementation); followed by the local close-out documentation commit that records this entry.
 - Review: standard/medium, four independent read-only lenses; accepted by developer 2026-11-05. One bookkeeping finding corrected and independently rechecked. Direct-executor tier unratcheted; no Antigravity tier.
 - Verification evidence: exact PowerShell commands and full fresh output are in HANDOFF.md. Selected output from that run:
   - `node --check server.mjs` — exit 0 (no output).
