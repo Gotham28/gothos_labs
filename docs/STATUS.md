@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-11-03
+Last updated: 2026-11-05
 
 ## Baseline
 - Source: https://github.com/x3O8/Gothos-labs.git
@@ -103,4 +103,16 @@ Notes / Open Questions
 - Files no page references (`git grep` over tracked `*.html`, `*.css`, `*.js`) are still published: `fly.mp4`, the manrope and open-sauce-one fonts (6 files), `assets/owl/source/owl-sheet.webp`, `assets/logo/gothos-owl.svg`, `assets/logbook/training-flow.svg`, `assets/logbook/training-reflection.svg`. Ignore or delete is undecided.
 - Expected, not tested here: Vercel Git deploys see only committed files, while CLI deploys upload the working directory, so untracked root items (`Gothos-labs/`, `show-*.jpg`, `.playwright-mcp/`, root `AGENTS.md` and `CLAUDE.md`) would not be covered by `.vercelignore` in a CLI deploy.
 
-
+### Catch-up — 2026-11-05 (SEO basics)
+Added canonical URLs and Open Graph metadata to the homepage and both product pages, homepage Organization structured data, robots.txt and a three-page sitemap. Added local preview text/XML MIME mappings and developer Search Console guidance. Local checks returned HTTP 200 with expected content types for all five routes, parsed the metadata, checked unchanged page bodies and confirmed referenced public assets remain included. Publication and Search Console setup are pending.
+Notes / Open Questions: live indexing, ranking and external sharing previews have not been checked. No ranking guarantee.
+- Branch: `vercel-publish`
+- PR: #3 https://github.com/Gotham28/gothos_labs/pull/3 — push and PR authorized by developer 2026-11-05; production deployment and merge not performed.
+- Commits: `47e33f9afbb2bacc510cc62717b39e80b8805e5e` (SEO implementation), `a22eb6d7a3797c419ca82bd69b6a732d75f39b42` (local close-out); followed by the documentation commit recording this PR.
+- Review: standard/medium, four independent read-only lenses; accepted by developer 2026-11-05. One bookkeeping finding corrected and independently rechecked. Direct-executor tier unratcheted; no Antigravity tier.
+- Verification evidence: exact PowerShell commands and full fresh output are in HANDOFF.md. Selected output from that run:
+  - `node --check server.mjs` — exit 0 (no output).
+  - `Invoke-WebRequest` loop over the five routes — `/ : 200 text/html; charset=utf-8`, `/elogbook.html : 200 text/html; charset=utf-8`, `/arogya.html : 200 text/html; charset=utf-8`, `/robots.txt : 200 text/plain; charset=utf-8`, `/sitemap.xml : 200 application/xml; charset=utf-8`.
+  - Inline PowerShell XML/JSON/metadata checks — `PASS sitemap XML: exactly three expected canonical URLs; Organization JSON: five expected properties and values`; all three page checks report unchanged body; `PASS 26 public page/runtime/discovery references exist and none are excluded by .vercelignore`.
+  - `git diff --check` — exit 0; only line-ending conversion warnings.
+- Deferred: publication and developer Search Console verification, submission and inspection steps in docs/SEO.md. Live indexing/ranking and external sharing previews unverified.

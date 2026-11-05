@@ -1,105 +1,131 @@
-# Vercel publish hygiene — execution handoff
+# SEO basics — execution handoff
+Date: 2026-11-05
+Baseline and HEAD: 4b9dd396e4891738b41feffd7ae59e03aa21f1d7; working-tree review on vercel-publish.
+Developer explicitly overrode the separate-chat requirement with "do it here". Direct executor. No commit, staging, push, PR, deployment, DNS or account changes.
 
-Date: 2026-11-03. Executor: Direct (Sonnet direct), route B, fresh execution session. Branch `vercel-publish`, created from `origin/main` (`e554503`). `git remote get-url origin` = `https://github.com/Gotham28/gothos_labs.git`; `git merge-base --is-ancestor e554503 origin/main` succeeded. The execution session committed, staged and pushed nothing. Independent high-assurance review: send-back, fix round 1, re-review; the developer accepted the work on 2026-11-03. Commit, push and PR happen at close-out (commit hashes and PR number are in the STATUS.md entry and on the PR).
+## Changes
+- index.html, elogbook.html, arogya.html: head-only canonical and five Open Graph fields using existing titles/descriptions and logo; homepage factual Organization JSON-LD.
+- robots.txt: allow crawling and reference sitemap.
+- sitemap.xml: exactly the three production canonical URLs.
+- server.mjs: only .txt and .xml MIME mappings.
+- docs/SEO.md: manual Search Console verification, sitemap submission, inspection, monitoring and limits, linked to official Google references.
+- docs/MASTER_PLAN.md: dated append-only §9 entry.
+- .agents/CURRENT_TASK.md: execution override and verification state.
+- HANDOFF.md: this report.
+Pre-existing .agents/AGENTS.md modifications, untracked artifacts and nested repository were left untouched. No visible copy/design or runtime script changes.
 
-## Status
-All Agent-bucket items are done. Local verification passes. The preview and production checks (Verification items 4 and 5) are not run: they need the Vercel project and DNS, which are the developer's.
-
-One halt happened and is resolved: the guard hook blocked `Write` to `.vercelignore` (it then allowed only `.agents/`, `docs/`, `HANDOFF.md`). I did not route around it. The developer created the file by hand (first as `.vercelignore.txt`, then renamed). I did not write `.vercelignore`; I only verified it.
-
-## What changed
-- `.vercelignore` (new, repo root, written by the developer): the 12 listed paths, one per line: `.agents/`, `docs/`, `tools/`, `reference-source/`, `HANDOFF.md`, `DESIGN.md`, `PRODUCT.md`, `README.md`, `REFERENCE.md`, `server.mjs`, `.gitignore`, `.gitattributes`. ASCII, no BOM, CRLF line endings (git's ignore matching handled them correctly, see evidence 1). 142 bytes.
-- `docs/MASTER_PLAN.md`: one line appended at the end of §9 (line 27), the exact wording from the task. No other line touched.
-- `HANDOFF.md`: replaced (previous task's content is in git at `5d2b9c2`).
-- `.agents/CURRENT_TASK.md`: I recorded the guard halt under "Blocked on developer input" (marked RESOLVED there). The task file is also in the commit list.
-
-## Evidence
-### 1. Ignore rules cover every tracked file under the ignored paths, and nothing else
-Command (run from `D:/Company Website`, git `core.excludesFile=.vercelignore`):
+## Verification
+Started preview with:
+```powershell
+$env:PORT = '49174'
+npm run dev
 ```
-git ls-files | git -c core.excludesFile=.vercelignore check-ignore --no-index --stdin
+Fresh output:
+```text
+> gothos-labs@1.0.0 dev
+> node server.mjs
+Gothos Labs preview: http://127.0.0.1:49174
 ```
-Output (exit 0), 23 files:
-```
-.agents/AGENTS.md
-.agents/CURRENT_TASK.md
-.agents/runs/run.mjs
-.agents/runs/v1-core.mjs
-.agents/runs/v2-fit.mjs
-.agents/runs/v3-owl.mjs
-.agents/runs/v4-input.mjs
-.agents/runs/v5-pages.mjs
-.agents/runs/v6-mode.mjs
-.gitattributes
-.gitignore
-DESIGN.md
-HANDOFF.md
-PRODUCT.md
-README.md
-REFERENCE.md
-docs/MASTER_PLAN.md
-docs/STATUS.md
-reference-source/GhostFibers.css
-reference-source/GhostFibers.jsx
-reference-source/ghost-fibers.js
-server.mjs
-tools/build-owl-atlas.py
-```
-Cross-check: `git ls-files .agents docs tools reference-source HANDOFF.md DESIGN.md PRODUCT.md README.md REFERENCE.md server.mjs .gitignore .gitattributes` printed the same 23 files, in the same order. The sets are identical.
+The sandbox denied socket access on the first preview attempt. Supported escalation was used for loopback preview and checks; no guard was changed. Initial checks also encountered a proxy/connection failure and a PowerShell reserved-variable error; corrected the check to use -NoProxy, a 10-second timeout and $homepageHtml. Final full run below exited 0. Both previews started by this task were stopped via Ctrl+C in their tool sessions; unrelated servers were not stopped.
 
-### 2. No file the pages load is ignored
-Command (39 files: `index.html`, `elogbook.html`, `arogya.html`, every root `*.css` and `*.js`, all of `assets/`, `fonts/`, `licenses/`, and `package.json`; `fly.mp4` is not in the pathspec, so the full published set is 40, see below):
-```
-git ls-files -- index.html elogbook.html arogya.html '*.css' '*.js' assets fonts licenses package.json | grep -v '^\(tools\|reference-source\|\.agents\|docs\)/' | git -c core.excludesFile=.vercelignore check-ignore --no-index --stdin
-```
-Output: empty. `exit=1` (git's "nothing ignored" code).
+Exact final command (PowerShell):
+```powershell
+$ErrorActionPreference = 'Stop'
+node --check server.mjs
+if ($LASTEXITCODE -ne 0) { throw 'Syntax check failed' }
+'PASS node --check server.mjs (exit 0; no output)'
+foreach ($route in @('/','/elogbook.html','/arogya.html','/robots.txt','/sitemap.xml')) {
+ $r = Invoke-WebRequest -UseBasicParsing -TimeoutSec 10 -NoProxy -Uri ("http://127.0.0.1:49174" + $route)
+ if ($r.StatusCode -ne 200) { throw "HTTP failure $route" }
+ $expected = if ($route -eq '/robots.txt') {'text/plain'} elseif ($route -eq '/sitemap.xml') {'application/xml'} else {'text/html'}
+ if ($r.Headers['Content-Type'] -notlike "$expected*") { throw "MIME failure $route" }
+ "$route : $($r.StatusCode) $($r.Headers['Content-Type'])"
+}
+[xml]$sitemap = Get-Content sitemap.xml -Raw
+$urls = @($sitemap.urlset.url | ForEach-Object { $_.loc })
+$expectedUrls = @('https://www.gothoslabs.com/','https://www.gothoslabs.com/elogbook.html','https://www.gothoslabs.com/arogya.html')
+if ($sitemap.DocumentElement.NamespaceURI -ne 'http://www.sitemaps.org/schemas/sitemap/0.9' -or $urls.Count -ne 3 -or (Compare-Object $urls $expectedUrls)) { throw 'Sitemap mismatch' }
+$homepageHtml = Get-Content index.html -Raw
+$orgMatches = [regex]::Matches($homepageHtml, '<script type="application/ld\+json">([\s\S]*?)</script>')
+if ($orgMatches.Count -ne 1) { throw 'JSON-LD count' }
+$org = $orgMatches[0].Groups[1].Value | ConvertFrom-Json
+if (Compare-Object @($org.PSObject.Properties.Name) @('@context','@type','name','url','logo')) { throw 'Unexpected organization properties' }
+$logo = 'https://www.gothoslabs.com/assets/logo/gothos-logo.png'
+if ($org.'@context' -ne 'https://schema.org' -or $org.'@type' -ne 'Organization' -or $org.name -ne 'Gothos Labs' -or $org.url -ne $expectedUrls[0] -or $org.logo -ne $logo) { throw 'Organization mismatch' }
+'PASS sitemap XML: exactly three expected canonical URLs; Organization JSON: five expected properties and values'
+$pages = @('index.html','elogbook.html','arogya.html')
+for ($i=0; $i -lt $pages.Count; $i++) {
+ $html = Get-Content $pages[$i] -Raw
+ $canon = [regex]::Matches($html, '<link rel="canonical" href="([^"]+)">')
+ if ($canon.Count -ne 1 -or $canon[0].Groups[1].Value -ne $expectedUrls[$i]) { throw 'Canonical mismatch' }
+ $title = [regex]::Match($html,'<title>(.*?)</title>').Groups[1].Value
+ $description = [regex]::Match($html,'<meta name="description" content="([^"]*)">').Groups[1].Value
+ $values = @{title=$title; description=$description; url=$expectedUrls[$i]; type='website'; image=$logo}
+ foreach ($field in $values.Keys) {
+  $m = [regex]::Matches($html, ('<meta property="og:'+$field+'" content="([^"]*)">'))
+  if ($m.Count -ne 1 -or $m[0].Groups[1].Value -cne $values[$field]) { throw "OG mismatch $field" }
+ }
+ $original = (git show ("HEAD:" + $pages[$i])) -join "`n"
+ $beforeBody = [regex]::Match($original,'(?s)</head>(.*)$').Groups[1].Value.Replace("`r",'').TrimEnd()
+ $afterBody = [regex]::Match($html,'(?s)</head>(.*)$').Groups[1].Value.Replace("`r",'').TrimEnd()
+ if ($beforeBody -cne $afterBody) { throw "Body modified $($pages[$i])" }
+ "PASS $($pages[$i]): canonical, five OG fields, unchanged body"
+}
+$robots = Get-Content robots.txt -Raw
+if ($robots -notmatch '(?m)^User-agent: \*\r?$' -or $robots -notmatch '(?m)^Allow: /\r?$' -or $robots -notmatch '(?m)^Sitemap: https://www\.gothoslabs\.com/sitemap\.xml\r?$') { throw 'Robots mismatch' }
+if (-not (Test-Path assets/logo/gothos-logo.png)) { throw 'Logo missing' }
+'PASS robots permission/sitemap agreement and existing logo'
+$originalServer = ((git show HEAD:server.mjs) -join "`n").TrimEnd()
+$currentServer = (Get-Content server.mjs -Raw).Replace("`r",'').TrimEnd()
+$expectedServer = $originalServer.Replace("const types = { ", "const types = { '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8', ")
+if ($currentServer -cne $expectedServer) { throw 'Unexpected server changes' }
+'PASS server: only two MIME mappings changed'
+$originalPlan = ((git show HEAD:docs/MASTER_PLAN.md) -join "`n").TrimEnd()
+if (-not (Get-Content docs/MASTER_PLAN.md -Raw).Replace("`r",'').StartsWith($originalPlan)) { throw 'Roadmap not append-only' }
+'PASS roadmap: original content retained as prefix'
+$refs = [System.Collections.Generic.HashSet[string]]::new()
+foreach ($p in $pages) {
+ $html = Get-Content $p -Raw
+ foreach ($m in [regex]::Matches($html,'(?:src|href)="([^"#?]+)(?:[?#][^"]*)?"')) {
+  $v=$m.Groups[1].Value
+  if ($v -notmatch '^[a-z]+:' -and $v -ne '/') { [void]$refs.Add($v.TrimStart('/')) }
+ }
+}
+foreach ($p in @(Get-ChildItem -File *.css,*.js)) {
+ foreach ($m in [regex]::Matches((Get-Content $p.FullName -Raw), '(?:assets|fonts)/[a-zA-Z0-9_./-]+')) { [void]$refs.Add($m.Value) }
+}
+foreach ($v in @('robots.txt','sitemap.xml')) { [void]$refs.Add($v) }
+foreach ($v in $refs) { if (-not (Test-Path -LiteralPath $v)) { throw "Missing reference $v" } }
+$excluded = @($refs | git -c core.excludesFile=.vercelignore check-ignore --no-index --stdin)
+if ($LASTEXITCODE -gt 1 -or $excluded.Count -gt 0) { throw "Public references excluded: $excluded" }
+"PASS $($refs.Count) public page/runtime/discovery references exist and none are excluded by .vercelignore"
+git diff --check -- index.html elogbook.html arogya.html server.mjs docs/MASTER_PLAN.md
+if ($LASTEXITCODE -ne 0) { throw 'Scoped whitespace check failed' }
+'PASS scoped git diff --check (exit 0)'
 
-Files that will be published (the complement of evidence 1: 63 tracked files minus the 23 ignored = 40 files; the command above covers 39 of them because its pathspec leaves out `fly.mp4`), from `check-ignore -v -n`: `arogya.html`, `elogbook.html`, `index.html`, `chat.js`, `owl.js`, `site.js`, `section-scroll.js`, `logbook-showcase.js`, `styles.css`, `owl-chat.css`, `logbook-showcase.css`, `product-page.css`, `product-preview.css`, `package.json`, `assets/logo/gothos-logo.png`, `assets/logo/gothos-owl.svg`, `assets/owl/owl-atlas.json`, `assets/owl/owl-atlas.webp`, `assets/owl/source/owl-sheet.webp`, `assets/screens/arogya-preview.webp`, `assets/screens/elogbook-preview.webp`, `assets/logbook/training-flow.svg`, `assets/logbook/training-reflection.svg`, `fly.mp4`, twelve `fonts/*` files (manrope ×4, open-sauce-one ×2, poppins ×6), four `licenses/*` files.
-
-### 3. Diff against origin/main
-Replaced in fix round 1 (review M1): the earlier output was filtered by a path list, so it hid the other changed files. Fresh, unfiltered output, run after the last edit to every file except this block:
-
-Command: `git diff --stat origin/main`
-Output:
 ```
-warning: in the working copy of '.agents/AGENTS.md', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of '.agents/CURRENT_TASK.md', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'HANDOFF.md', LF will be replaced by CRLF the next time Git touches it
+
+Fresh final output:
+```text
+PASS node --check server.mjs (exit 0; no output)
+/ : 200 text/html; charset=utf-8
+/elogbook.html : 200 text/html; charset=utf-8
+/arogya.html : 200 text/html; charset=utf-8
+/robots.txt : 200 text/plain; charset=utf-8
+/sitemap.xml : 200 application/xml; charset=utf-8
+PASS sitemap XML: exactly three expected canonical URLs; Organization JSON: five expected properties and values
+PASS index.html: canonical, five OG fields, unchanged body
+PASS elogbook.html: canonical, five OG fields, unchanged body
+PASS arogya.html: canonical, five OG fields, unchanged body
+PASS robots permission/sitemap agreement and existing logo
+PASS server: only two MIME mappings changed
+PASS roadmap: original content retained as prefix
+PASS 26 public page/runtime/discovery references exist and none are excluded by .vercelignore
+warning: in the working copy of 'arogya.html', LF will be replaced by CRLF the next time Git touches it
 warning: in the working copy of 'docs/MASTER_PLAN.md', LF will be replaced by CRLF the next time Git touches it
- .agents/AGENTS.md       |   4 +-
- .agents/CURRENT_TASK.md | 339 ++++++--------------------
- HANDOFF.md              | 637 +++++++++---------------------------------------
- docs/MASTER_PLAN.md     |   1 +
- 4 files changed, 193 insertions(+), 788 deletions(-)
-```
-Command: `git status --short -- .vercelignore`
-Output:
-```
-?? .vercelignore
-```
-Reading it:
-- `.agents/AGENTS.md` is the pre-existing, deliberately uncommitted change (Do NOT touch list). Never staged.
-- `.agents/CURRENT_TASK.md` carries the guard-halt note, the review send-back note, the amended Verification items and the ticked boxes.
-- `docs/MASTER_PLAN.md` is the one-line §9 append.
-- `HANDOFF.md` is this file. The counts pasted above were captured before this file and the task file were last edited, so they differ from later runs of the same command (a later run showed `HANDOFF.md` 631 and `.agents/CURRENT_TASK.md` 348 changed lines). The committed diff is the authority.
-- `REFERENCE.md` does not appear: the developer has not edited it (Manual item still open).
-- `.vercelignore` is untracked, so `git diff` cannot show it; the `git status` line above does.
-- The large counts for `.agents/CURRENT_TASK.md` and `HANDOFF.md` come from both files being replaced for this task (the previous task's content is in git). Git's LF-to-CRLF warnings are harmless. No other tracked file differs from `origin/main`.
-
-### 4. Preview and 5. Production: not run
-Need the Vercel project and DNS (developer only). Local evidence proves the ignore rules only; it does not prove Vercel honours them (§5.10). The probe list, expected codes, `/.vercelignore` report-only rule, 401/403 Deployment Protection rule and halt rules are in `.agents/CURRENT_TASK.md` `## Verification required`. That section is the authority; this file holds no copy of it. Preview probes run at close-out against the PR's Vercel preview URL; production probes run after the developer merges.
-
-## Not done / needs the developer
-- `REFERENCE.md` lines 42–43: Manual, not edited (still the `hoot-body.png` / `hoot-wing.png` lines at the time of fix round 1). Commit without it and leave it as a follow-up, per the task.
-- Delete `.agents/commit-msg.txt` (Manual).
-- Preview checks (run by the close-out session), then merge and production checks (developer).
-
-## Noticed, out of scope (not acted on)
-- `fly.mp4` and `assets/owl/source/owl-sheet.webp` will be published. The task already excludes deleting `fly.mp4`; the source sheet (`assets/owl/source/`) is the 4x4 art the atlas was built from. Neither is referenced by any `*.html`, `*.css` or `*.js` file (grep for `fly\.mp4|owl-sheet` returned no matches), so they are dead weight on the live site. Worth a follow-up decision on whether to ignore or delete them.
-- `package.json` is published. The task says do not ignore it. If Vercel runs its `start` script, that is the preview-check halt above.
-
-## Fix round 1 (review 2026-11-03, developer decision "Send back")
-Docs only. Files touched: `HANDOFF.md`, `.agents/CURRENT_TASK.md`. Not touched: `.vercelignore`, any site file, `package.json`, `server.mjs`, `.agents/AGENTS.md`, `docs/STATUS.md`. Nothing staged, committed or pushed. Nothing written outside the repo.
+warning: in the working copy of 'elogbook.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'index.html', LF will be replaced by CRLF the next time Git touches it
+PASS scoped git diff --check (exit 0)
 
 | Finding | Check against the repo | Action |
 |---|---|---|
