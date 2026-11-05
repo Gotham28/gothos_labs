@@ -20,7 +20,7 @@ ELogBook and AROGYA detail live on two ordinary scrolling pages, elogbook.html a
 
 elogbook.html carries the original six illustrative screens, keyboard tabs and shared expanded dialog. Empty states are intentional: no authenticated, resident or patient records are loaded. The two landing-page screenshots in assets/screens/ are snapshots of those previews, labelled illustrative.
 
-Hoot is the website guide, separate from both products. With an empty endpoint it uses local scripted company replies, refuses medical questions and prepares demo enquiry text files. It never confirms a booking or claims a message was sent. Inputs stay in memory, are rendered as text and are cleared when Hoot closes. Only the motion-pause preference uses sessionStorage.
+Hoot is the website guide, separate from both products. Company questions go to a private OpenAI-backed endpoint; the editable HOOT_KNOWLEDGE.md supplies product facts. Medical questions receive a local refusal, and demo enquiries are sent only after explicit visitor confirmation and email-provider acceptance. It never confirms a booking. Inputs stay in browser memory, are rendered as text and are cleared when Hoot closes. Only the motion-pause preference uses sessionStorage.
 
 ## Source layout
 
@@ -31,7 +31,7 @@ Hoot is the website guide, separate from both products. With an empty endpoint i
 - section-scroll.js: the transition engine. Wheel gestures end only after 160ms of quiet, so momentum cannot start a second move; keys, swipes, links, history and focus all go through one `go()` that ignores input while a move runs.
 - logbook-showcase.css / logbook-showcase.js: ELogBook page role tabs, feature list and preview placement.
 - product-preview.css: light frosted-glass ELogBook interface.
-- site.js: shared motion state, dialogs, preview tabs and expanded dialog (ELogBook page only), local brief download and assistant configuration.
+- site.js: shared motion state, dialogs, preview tabs and expanded dialog (ELogBook page only), enquiry submission and assistant configuration.
 - owl.js: one shared requestAnimationFrame scheduler, the sprite renderer (pose, yaw, wingbeat, blink), per-section perches read from the layout, and flights driven by the transition's eased progress. On product pages it only perches the owl.
 - assets/screens/: elogbook-preview.webp and arogya-preview.webp, snapshots of the illustrative previews captured from the local pages (no personal data).
 - chat.js / owl-chat.css: Hoot interactions, conversation state and presentation.
@@ -41,7 +41,7 @@ Hoot is the website guide, separate from both products. With an empty endpoint i
 - tools/build-owl-atlas.py: the dev-only atlas builder above.
 - fonts/ and licenses/: local assets and original licenses; Poppins has its own SIL OFL file.
 - reference-source/: original GhostFibers sources and archived buildless adapter. None is loaded at runtime.
-- server.mjs: unchanged dependency-free local server.
+- server.mjs: dependency-free local server and private Hoot API route.
 
 ## Assistant configuration
 
@@ -51,11 +51,13 @@ The single SITE_CONFIG block in site.js controls assistantUrl, assistantFrameAll
 
 For a genuine configured demo, verify its public route and current frame policy first. If framing is blocked, set assistantFrameAllowed false and use the new-tab path; changing that product's frame-ancestors policy is separate work in its own repository. The conditional dialog always includes a new-tab link, the personal-health-information notice and the supplied medical disclaimer. Its iframe is created only on activation and removed on close. Microphone delegation is added only when assistantVoiceVerified is true; actual browser permission is still necessary. No embedded voice interaction has been validated here.
 
-CHAT_ENDPOINT in chat.js is deliberately empty. A future approved endpoint can accept POST {messages} and return {reply}, but activation requires separate review of privacy, medical-routing and server-side boundaries. Never place provider keys in browser code.
+Hoot's editable facts live in `HOOT_KNOWLEDGE.md`. Keep them approved, concise and free of secrets or patient data. Its API code is in `hoot-api.mjs`, exposed locally by `server.mjs` and on Vercel by `api/chat.mjs`. It accepts POST `{messages}` and returns `{reply}`. API calls use `store: false`; no chat transcript is written by this repository. The browser shows a plain unavailable message when the API is not configured or fails.
+
+For the local preview, edit the ignored `hoot.config.local.json` and put the OpenAI key in `apiKey`; change `model` in the same file. It starts with `gpt-4o-mini` because the owner asked to choose the model, but official documentation currently marks that model deprecated. Set a supported model when ready. Never commit the local file. In Vercel, create a private environment variable named `HOOT_CONFIG_JSON` whose value is the same JSON object containing `apiKey` and `model`; it overrides the local file. Redeploy after setting it. No API key belongs in HTML, `chat.js`, a committed file, or a chat message. The local preview stays dependency-free (`npm.cmd run dev`).
 
 ## Honest local enquiries
 
-The form and Hoot share a Blob text-download helper. Nothing is delivered or stored server-side, and no booking is made. No contact address or delivery destination has been invented. Use synthetic data for verification.
+The form and Hoot's confirmed demo enquiries now call `/api/enquiry`, implemented locally in `server.mjs` and on Vercel in `api/enquiry.mjs`. The recipient is fixed to `therealgautam2004@gmail.com`; the sender and Resend key come from Git-ignored `enquiry.config.local.json` locally, or a private `ENQUIRY_CONFIG_JSON` environment variable on Vercel. No booking is made. See `EMAIL_SETUP.md` for domain, key, deployment, and live delivery checks. The site retains the form contents on failure and uses a retry ID to avoid duplicate emails.
 
 ## Motion and accessibility
 

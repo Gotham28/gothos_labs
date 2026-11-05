@@ -13,6 +13,14 @@
     tick: (now, dt) => tickers.forEach(fn => fn(now, dt))
   };
   document.documentElement.classList.add('js');
+  // Separate leaves can sway at different rates without moving section content.
+  document.querySelectorAll('.slide').forEach(slide => {
+    const leaves = document.createElement('div');
+    leaves.className = 'ambient-leaves';
+    leaves.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < 5; i++) leaves.append(document.createElement('span'));
+    slide.prepend(leaves);
+  });
   const motionButton = document.getElementById('motion-control');
   function syncMotion() {
     motion.enabled = !reduced.matches && !paused;
@@ -141,18 +149,30 @@
   previewDialog.addEventListener('close',()=>{previewHome.append(previewWindow);if(previewTrigger?.isConnected)previewTrigger.focus({preventScroll:true});});
   }
 
-  site.downloadBrief = ({name='', email='', topic='', message=''}) => {
-    const line=value=>String(value).replace(/[\r\n]+/g,' ').slice(0,300);
-    const brief = 'Gothos Labs enquiry\n\nName: '+line(name)+'\nEmail: '+line(email)+'\nTopic: '+line(topic)+'\n\n'+String(message).slice(0,3000)+'\n\nPrepared locally on your device. Nothing has been sent and no booking has been made.\n';
-    const url=URL.createObjectURL(new Blob([brief],{type:'text/plain;charset=utf-8'}));
-    const anchor=document.createElement('a');anchor.href=url;anchor.download='gothos-labs-enquiry.txt';
-    document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  site.submitEnquiry = async (details, signal) => {
+    const response = await fetch('/api/enquiry', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(details), signal });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.sent) throw new Error(result.error || 'The enquiry could not be sent. Please try again.');
+    return result;
   };
-  document.getElementById('enquiry-form')?.addEventListener('submit',event=>{
+  const enquiryForm = document.getElementById('enquiry-form');
+  let submissionId = null;
+  enquiryForm?.addEventListener('input', () => { submissionId = null; });
+  enquiryForm?.addEventListener('change', () => { submissionId = null; });
+  enquiryForm?.addEventListener('submit', async event => {
     event.preventDefault();const form=event.currentTarget;
     if(!form.reportValidity())return;
-    const data=new FormData(form);site.downloadBrief({name:data.get('name'),email:data.get('email'),topic:data.get('topic'),message:data.get('message')});
-    document.getElementById('form-status').textContent='Your local brief is ready. Nothing was sent.';
+    const data=new FormData(form),status=document.getElementById('form-status');
+    const fields=[...form.querySelectorAll('input,select,textarea,button')];
+    submissionId ||= crypto.randomUUID();
+    fields.forEach(field => field.disabled=true);
+    status.textContent='Sending your enquiry…';
+    try {
+      await site.submitEnquiry({name:data.get('name'),email:data.get('email'),topic:data.get('topic'),message:data.get('message'),website:data.get('website'),submissionId});
+      status.textContent='Your enquiry was accepted for delivery. No booking has been made.';
+      form.reset();submissionId=null;
+    } catch(error) {status.textContent=error.message || 'The enquiry could not be sent. Please try again.';}
+    finally {fields.forEach(field => field.disabled=false);}
   });
 
   // The illustrative AROGYA conversation plays once on arogya.html when it scrolls into view.
