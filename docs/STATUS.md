@@ -107,8 +107,8 @@ Notes / Open Questions
 Added canonical URLs and Open Graph metadata to the homepage and both product pages, homepage Organization structured data, robots.txt and a three-page sitemap. Added local preview text/XML MIME mappings and developer Search Console guidance. Local checks returned HTTP 200 with expected content types for all five routes, parsed the metadata, checked unchanged page bodies and confirmed referenced public assets remain included. Publication and Search Console setup are pending.
 Notes / Open Questions: live indexing, ranking and external sharing previews have not been checked. No ranking guarantee.
 - Branch: `vercel-publish`
-- PR: N/A — local-only close-out; publication not authorized.
-- Commits: `47e33f9afbb2bacc510cc62717b39e80b8805e5e` (SEO implementation); followed by the local close-out documentation commit that records this entry.
+- PR: #3 https://github.com/Gotham28/gothos_labs/pull/3 — push and PR authorized by developer 2026-11-05; production deployment and merge not performed.
+- Commits: `47e33f9afbb2bacc510cc62717b39e80b8805e5e` (SEO implementation), `a22eb6d7a3797c419ca82bd69b6a732d75f39b42` (local close-out); followed by the documentation commit recording this PR.
 - Review: standard/medium, four independent read-only lenses; accepted by developer 2026-11-05. One bookkeeping finding corrected and independently rechecked. Direct-executor tier unratcheted; no Antigravity tier.
 - Verification evidence: exact PowerShell commands and full fresh output are in HANDOFF.md. Selected output from that run:
   - `node --check server.mjs` — exit 0 (no output).
