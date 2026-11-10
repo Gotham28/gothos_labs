@@ -6,15 +6,17 @@ A spacious product-studio marketing site for teams and hospital buyers: a custom
 
 ## Composition
 
-Six full-screen sections (100dvh with svh/vh fallbacks), changed one at a time. Every section fits its screen with no internal scrolling at 360x640 and up; a screenshot is the one flexible block and shrinks, whole and uncropped, to what is left. Developer decision (2026-11-02): on short or zoomed screens, or where a section's content does not fit, the page scrolls normally instead of using the deck, and the owl then perches small in the corner as on the product pages. The thresholds are an implementation choice, not the developer's: the deck turns on from 360x640 up and only if every section fits, stays on down to 600px high, and is re-checked on resize and when content changes size (growth alone can only turn it off; a resize turns it back on). It holds at wide, short windows such as 1920x640 because the screenshot also shrinks to the available height.
-1. Hero: "Gothos Labs" and the headline only, centred (left on phones); owl perched bottom right.
-2. What we do: heading and the approved paragraph on the left, the owl perched on the right (under the text on phones). No other copy.
-3. ELogBook: intro, an illustrative screenshot and "Explore ELogBook"; owl perched beside the button.
-4. AROGYA: mirrored layout, screenshot on the left, the one-line disclaimer, "Explore AROGYA", owl beside the button.
-5. Ask the owl: heading, the approved two lines and "Talk to Hoot" with the owl beside it.
-6. Talk to us: heading with the owl beneath it, the enquiry form, and a slim footer line (©, Pause motion, links).
+Seven full-screen sections (100dvh with svh/vh fallbacks), changed one at a time. Every section fits its screen with no internal scrolling at 360x640 and up; a screenshot is the one flexible block and shrinks, whole and uncropped, to what is left. Developer decision (2026-11-02): on short or zoomed screens, or where a section's content does not fit, the page scrolls normally instead of using the deck, and the owl then perches small in the corner as on the product pages. The thresholds are an implementation choice, not the developer's: the deck turns on from 360x640 up and only if every section fits, stays on down to 600px high, and is re-checked on resize and when content changes size (growth alone can only turn it off; a resize turns it back on). It holds at wide, short windows such as 1920x640 because the screenshot also shrinks to the available height.
+Type rule: on every panel the name is the large heading (`--fs-title`), the former tagline is a medium subheading (`--fs-tagline`, the `.tagline` class), then the lede (`--fs-lede`).
+1. Hero: "Gothos Labs" and the headline "Software, perfected by AI." only, centred (left on phones); owl perched bottom right.
+2. What we do: heading, tagline and the approved paragraph on the left, the owl perched on the right (under the text on phones). No other copy.
+3. Our products: heading, tagline and the two products as links to their panels (`.product-list`), the owl perched under the text (bottom right on phones).
+4. ELogBook: name, tagline, intro, an illustrative screenshot and "Explore ELogBook"; owl perched beside the button. Uses the shared `.s-product` layout.
+5. AROGYA: the same `.s-product` layout with `.is-flipped`: screenshot on the left, the one-line disclaimer, "Explore AROGYA", owl beside the button.
+6. Ask Mochi: heading, the approved two lines and "Talk to Mochi" with the owl beside it.
+7. Talk to us: heading with the owl beneath it, the enquiry form, and a slim footer line (©, Pause motion, links).
 
-Each section keeps an empty `.perch` box in its own layout (in flow wherever possible), sized from the owl's body size, so the owl never covers text, buttons, the screenshot or the form. Navigation: header links, six side dots (aria-current), keyboard, swipes and history all drive the same engine. Mobile navigation remains an expanded menu.
+Each section keeps an empty `.perch` box in its own layout (in flow wherever possible), sized from the owl's body size, so the owl never covers text, buttons, the screenshot or the form. Navigation: header links, side dots generated from the slides' `data-label` (aria-current), keyboard, swipes and history all drive the same engine. Mobile navigation remains an expanded menu.
 
 Product pages (elogbook.html, arogya.html) use the same header, logo, fonts and tokens, scroll normally, and keep the landing page's gradients and pill buttons.
 
@@ -46,7 +48,7 @@ Animation uses transforms and opacity with static blur/masks. Letter reveals rep
 
 The original six-screen preview now lives on elogbook.html; its expanded view is one native dialog that returns the window to its home on close. Keyboard tabs, empty states and focus return are preserved. The assistant illustration on arogya.html is an administrative example and plays once, then rests. The landing page shows only still, labelled snapshots of the two previews.
 
-Hoot's native modal moves the interactive owl into the modal layer, flies it to the panel and restores it on close. At 390px it becomes a bottom sheet. Native focus trapping is reinforced for keyboard edges, Esc closes, and labelled controls have visible focus rings.
+Mochi's native modal moves the interactive owl into the modal layer, flies it to the panel and restores it on close. At 390px it becomes a bottom sheet. Native focus trapping is reinforced for keyboard edges, Esc closes, and labelled controls have visible focus rings.
 
 ## Reference inspection
 
