@@ -5,7 +5,7 @@
 @font-face{font-family:Poppins;src:url('fonts/poppins-600.woff2') format('woff2');font-weight:600;font-display:swap}
 @font-face{font-family:Poppins;src:url('fonts/poppins-700.woff2') format('woff2');font-weight:700;font-display:swap}
 @font-face{font-family:Poppins;src:url('fonts/poppins-800.woff2') format('woff2');font-weight:800;font-display:swap}
-:root{--bg:#f7f6f1;--sage:#dde9df;--emerald:#2f8f5b;--emerald-text:#1f7a49;--forest:#1e5b3f;--deep:#123d2b;--ink:#14231b;--muted:#4a5f53;--pad:clamp(18px,3.2vw,46px);--gx:clamp(22px,7vw,120px);--header:78px;--owl:min(43vh,24.5vw)}
+:root{--bg:#f7f6f1;--sage:#dde9df;--emerald:#2f8f5b;--emerald-text:#1f7a49;--forest:#1e5b3f;--deep:#123d2b;--ink:#14231b;--muted:#4a5f53;--pad:clamp(18px,3.2vw,46px);--gx:clamp(22px,7vw,120px);--header:78px;--owl:min(43vh,24.5vw);--fs-title:clamp(34px,min(5.6vw,9.4vh),84px);--fs-tagline:clamp(17px,min(1.9vw,3.4vh),26px);--fs-lede:clamp(13.5px,min(1.18vw,2.2vh),18px)}
 @supports(height:100dvh){:root{--owl:min(43dvh,24.5vw)}}
 *{box-sizing:border-box}html:has(.product-page){scrollbar-gutter:stable}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Poppins,system-ui,sans-serif}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed}a{color:inherit}a,button,input,textarea,select{-webkit-tap-highlight-color:transparent}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #33824e;outline-offset:5px}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.12}[tabindex="-1"]:focus{outline:none}svg{display:block;width:24px;height:24px;flex:none}.svg-definitions{position:absolute;width:0;height:0;overflow:hidden}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.skip-link{position:fixed;top:-80px;left:20px;z-index:200;padding:12px 20px;background:var(--forest);color:#fff;border-radius:30px}.skip-link:focus{top:12px}[hidden]{display:none!important}
 
@@ -19,7 +19,7 @@
 /* Buttons */
 .pill{display:inline-flex;justify-content:center;align-items:center;gap:16px;white-space:nowrap;text-decoration:none;border:1.8px solid currentColor;border-radius:999px;padding:12px 22px;font-size:13px;font-weight:600;line-height:1.4;background:transparent;transition:color .25s,background .25s,transform .25s}.pill svg{width:16px;height:16px}.pill:hover:not(:disabled){background:var(--forest);border-color:var(--forest);color:#fff;transform:translateY(-2px)}.pill--solid{background:var(--forest);border-color:var(--forest);color:#fff}.pill--solid:hover:not(:disabled){background:var(--deep)}.pill:disabled{opacity:.68}.button-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:26px}
 
-/* Deck: six full-screen sections changed one at a time by section-scroll.js. */
+/* Deck: seven full-screen sections changed one at a time by section-scroll.js. */
 /* Without the deck (no script, a short or zoomed screen, or text that does not fit)
    the sections simply stack and the page scrolls. section-scroll.js adds .deck-mode
    to <html> only where every section fits the screen. */
@@ -51,6 +51,7 @@
 @media(max-width:759px){.ambient-leaves span{width:calc(var(--size) * .85);height:calc(var(--size) * .85)}}
 .s-hero{background:radial-gradient(60% 55% at 85% 12%,rgba(190,225,200,.75),transparent 70%),radial-gradient(55% 60% at 8% 100%,rgba(205,230,213,.85),transparent 70%),linear-gradient(180deg,#fbfaf6,#f1f4ec)}
 .s-wwd{background:radial-gradient(55% 60% at 12% 14%,rgba(196,226,205,.7),transparent 70%),radial-gradient(50% 55% at 92% 96%,rgba(205,230,213,.8),transparent 70%),linear-gradient(180deg,#fbfaf6,#f2f5ee)}
+.s-products{background:radial-gradient(52% 58% at 90% 90%,rgba(196,226,205,.75),transparent 70%),radial-gradient(48% 52% at 6% 8%,rgba(214,234,219,.8),transparent 70%),linear-gradient(190deg,#fbfaf6,#f1f5ee)}
 .s-elb{background:radial-gradient(60% 60% at 92% 10%,rgba(196,226,205,.8),transparent 70%),linear-gradient(160deg,#e9f1e8,#f6f6f0 72%)}
 .s-arogya{background:radial-gradient(55% 60% at 8% 86%,rgba(196,226,205,.75),transparent 70%),radial-gradient(45% 50% at 95% 6%,rgba(214,234,219,.9),transparent 70%),linear-gradient(200deg,#fcfbf8,#f1f5ee)}
 .s-owl{background:radial-gradient(48% 56% at 50% 52%,rgba(183,219,195,.7),transparent 72%),linear-gradient(180deg,#f9f8f3,#eef4ec)}
@@ -62,10 +63,11 @@
 .deck-dots a::before{content:'';width:8px;height:8px;border-radius:50%;border:1.5px solid var(--forest);opacity:.55;transition:background .3s,opacity .3s,transform .3s}
 .deck-dots a[aria-current=true]::before{background:var(--forest);opacity:1;transform:scale(1.3)}
 
-/* Shared slide type */
-.kicker{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--emerald-text);margin-bottom:clamp(10px,2.4vh,22px)}.kicker::after{content:'';width:46px;height:1px;background:currentColor}
-.slide h2{font-weight:700;font-size:clamp(28px,min(4.3vw,7.3vh),66px);line-height:1.06;letter-spacing:-.035em;color:var(--forest);max-width:14ch;text-wrap:balance}
-.lede{margin-top:clamp(12px,2.8vh,26px);font-size:clamp(13.5px,min(1.18vw,2.2vh),18px);line-height:1.7;color:#3f5448;max-width:520px}
+/* Shared slide type: the name is the large heading, the tagline a medium subheading, then the lede. */
+.slide h2{font-weight:700;font-size:var(--fs-title);line-height:1.06;letter-spacing:-.035em;color:var(--forest);max-width:14ch;text-wrap:balance}
+.tagline{margin-top:clamp(8px,1.8vh,16px);font-size:var(--fs-tagline);font-weight:500;line-height:1.3;letter-spacing:-.015em;color:var(--emerald-text);max-width:28ch;text-wrap:balance}
+.lede{margin-top:clamp(12px,2.8vh,26px);font-size:var(--fs-lede);line-height:1.7;color:#3f5448;max-width:520px}
+.tagline+.lede{margin-top:clamp(10px,2.2vh,20px)}
 .perch{display:none;flex:none;width:calc(var(--owl)*.52);height:calc(var(--owl)*.6);pointer-events:none}.deck-mode .perch{display:block}
 .cta-row{display:flex;align-items:flex-end;gap:clamp(8px,2vw,22px);margin-top:clamp(8px,2vh,18px)}.cta-row .pill{margin-bottom:clamp(4px,1.4vh,14px)}
 /* The whole screenshot always shows: it scales down to the room left, keeping its shape, and is never cropped. */
@@ -86,22 +88,32 @@
 .s-wwd .slide-inner{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);column-gap:7%;align-items:center}
 .wwd-side{display:flex;justify-content:center;align-items:center;min-width:0}
 
-/* 3 ELogBook, 4 AROGYA */
-.s-elb .slide-inner,.s-arogya .slide-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:"text shot" "cta shot";grid-template-rows:auto auto;column-gap:6%;align-content:center;align-items:end}
-.s-arogya .slide-inner{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-areas:"shot text" "shot cta"}
-.slide-text{grid-area:text;align-self:end}.slide-text .lede{max-width:480px}
-.s-elb .shot,.s-arogya .shot{grid-area:shot;align-self:center}
-.s-arogya .shot img{max-width:min(100%,560px)}
-.slide-cta{grid-area:cta;align-self:start}
-.s-arogya .disclaimer{font-size:clamp(10.5px,1.5vh,12px);line-height:1.6;color:var(--muted);max-width:480px;margin-top:clamp(8px,1.8vh,16px);border-left:3px solid #a9d3b4;padding-left:12px}
+/* 3 Our products: the name and tagline, the two products as links, and the owl's perch */
+.s-products .slide-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:"text list" "perch list";grid-template-rows:auto auto;column-gap:7%;align-content:center;align-items:center}
+.products-text{grid-area:text;align-self:end}
+.s-products .perch{grid-area:perch;align-self:start;margin-top:clamp(4px,2vh,22px)}
+.product-list{grid-area:list;list-style:none;margin:0;padding:0;display:grid;gap:clamp(10px,2.2vh,18px);min-width:0}
+.product-link{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name arrow" "line arrow";column-gap:18px;align-items:center;text-decoration:none;padding:clamp(14px,2.8vh,26px) clamp(18px,2vw,30px);border-radius:clamp(16px,1.8vw,24px);background:rgba(255,255,255,.64);border:1px solid rgba(255,255,255,.9);box-shadow:0 30px 80px rgba(30,91,63,.12);transition:transform .25s,box-shadow .25s}
+.product-link:hover{transform:translateY(-3px);box-shadow:0 34px 80px rgba(30,91,63,.2)}
+.product-link svg{grid-area:arrow;width:22px;height:22px;color:var(--forest)}
+.product-name{grid-area:name;font-weight:700;font-size:clamp(20px,min(2.4vw,4.2vh),32px);line-height:1.15;letter-spacing:-.03em;color:var(--forest)}
+.product-line{grid-area:line;margin-top:4px;font-size:var(--fs-lede);line-height:1.55;color:#3f5448}
 
-/* 5 Talk to the owl */
+/* 4 ELogBook, 5 AROGYA: one shared layout. .is-flipped puts the screenshot on the left. */
+.s-product .slide-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:"text shot" "cta shot";grid-template-rows:auto auto;column-gap:6%;align-content:center;align-items:end}
+.s-product.is-flipped .slide-inner{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-areas:"shot text" "shot cta"}
+.slide-text{grid-area:text;align-self:end}.slide-text .lede{max-width:480px}
+.s-product .shot{grid-area:shot;align-self:center}
+.slide-cta{grid-area:cta;align-self:start}
+.s-product .disclaimer{font-size:clamp(10.5px,1.5vh,12px);line-height:1.6;color:var(--muted);max-width:480px;margin-top:clamp(8px,1.8vh,16px);border-left:3px solid #a9d3b4;padding-left:12px}
+
+/* 6 Talk to Mochi */
 .s-owl .slide-inner{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
 .s-owl h2{max-width:none;font-size:clamp(34px,min(6.2vw,11vh),96px)}
 .s-owl .lede{margin-inline:auto;max-width:520px}
 .s-owl .cta-row{justify-content:center;margin-top:clamp(10px,2.4vh,24px)}
 
-/* 6 Contact */
+/* 7 Contact */
 .s-contact .slide-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:7%;align-items:center;padding-bottom:clamp(54px,9vh,80px)}
 .contact-intro{display:flex;flex-direction:column;align-items:flex-start}
 .s-contact h2{max-width:none;font-size:clamp(34px,min(6.2vw,11vh),92px)}
@@ -137,29 +149,31 @@ html:not(.deck-mode) .s-contact .slim-footer{position:relative;left:auto;right:a
 @keyframes typing{to{opacity:.3;transform:translateY(-3px)}}
 
 /* Short screens */
-@media(max-height:760px) and (min-width:760px){.kicker{font-size:11px}.lede{line-height:1.6}.enquiry-form label{font-size:10.5px}.enquiry-form input,.enquiry-form select{min-height:36px;padding:7px 12px}}
+@media(max-height:760px) and (min-width:760px){.lede{line-height:1.6}.enquiry-form label{font-size:10.5px}.enquiry-form input,.enquiry-form select{min-height:36px;padding:7px 12px}}
 
 /* Phones and narrow windows */
-@media(max-width:1000px) and (min-width:760px){.brand{font-size:15px}.site-header{gap:15px}.nav-links{gap:16px}.s-elb .slide-inner,.s-arogya .slide-inner{column-gap:4%}.s-wwd .slide-inner{column-gap:5%}}
+@media(max-width:1000px) and (min-width:760px){.brand{font-size:15px}.site-header{gap:15px}.nav-links{gap:16px}.s-product .slide-inner{column-gap:4%}.s-wwd .slide-inner,.s-products .slide-inner{column-gap:5%}}
 @media(max-width:759px){
- :root{--header:68px;--owl:min(50vw,28vh);--gx:22px}
+ :root{--header:68px;--owl:min(50vw,28vh);--gx:22px;--fs-title:clamp(30px,min(10.5vw,5.6vh),44px);--fs-tagline:clamp(15px,min(4.4vw,2.6vh),18px);--fs-lede:13.5px}
  @supports(height:100dvh){:root{--owl:min(50vw,28dvh)}}
  .site-header{padding:0 18px;gap:8px}.brand{font-size:14px;gap:7px}.brand img{width:28px;height:34px}.brand-labs{margin-left:3px}.menu-button{display:flex}
  .nav-links{display:none;position:absolute;top:calc(var(--header) - 4px);left:14px;right:14px;padding:22px;background:var(--bg);color:var(--forest);box-shadow:0 14px 30px #153a2015;border:1px solid #c4d6c8;border-radius:15px;flex-direction:column;align-items:stretch;gap:20px}.nav-links.open{display:flex}.nav-links a,.nav-links button{font-size:14px;text-align:left}.nav-links .nav-cta{border:0;padding:0;font-weight:500}
  .slide-inner{padding-top:calc(var(--header) + 10px);padding-bottom:18px}
  .deck-dots a{width:22px;height:22px}
- .kicker{font-size:11px;margin-bottom:8px}.kicker::after{width:30px}
- .slide h2{font-size:clamp(25px,min(8.2vw,4.6vh),34px);max-width:none}
- .lede{font-size:13.5px;line-height:1.6;margin-top:10px}
- .s-arogya .disclaimer{font-size:10.5px;margin-top:8px}
+ .slide h2{max-width:none}
+ .tagline{margin-top:6px;max-width:none}
+ .lede,.tagline+.lede{line-height:1.6;margin-top:10px}
+ .s-product .disclaimer{font-size:10.5px;margin-top:8px}
  .cta-row{margin-top:6px}.cta-row .pill{font-size:12px;padding:11px 18px;margin-bottom:6px}
  .s-hero .slide-inner{place-items:center start;text-align:left}.hero-copy{margin-bottom:12vh}.hero-rule{margin-left:0}
  .s-hero h1{font-size:clamp(36px,10.4vw,56px)}
  .s-hero .perch{right:12%;bottom:max(18px,4vh)}
  .s-wwd .slide-inner{grid-template-columns:1fr;align-content:center;row-gap:0}.wwd-side{justify-content:flex-end;margin-top:8px}
- .s-elb .slide-inner,.s-arogya .slide-inner{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"text" "shot" "cta";align-content:stretch;align-items:start;row-gap:10px}
- .s-arogya .slide-inner{grid-template-columns:minmax(0,1fr);grid-template-areas:"text" "shot" "cta"}
- .s-elb .shot,.s-arogya .shot{align-self:stretch}.shot img{border-radius:12px;max-height:100%}.shot figcaption{margin-top:6px} .slide-cta{align-self:end}
+ .s-products .slide-inner{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;grid-template-areas:"text" "list" "perch";align-content:center;align-items:start;row-gap:14px}
+ .products-text{align-self:start}.s-products .perch{justify-self:end;margin-top:0}
+ .product-link{padding:12px 16px;column-gap:12px}.product-name{font-size:20px}
+ .s-product .slide-inner,.s-product.is-flipped .slide-inner{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"text" "shot" "cta";align-content:stretch;align-items:start;row-gap:10px}
+ .s-product .shot{align-self:stretch}.shot img{border-radius:12px;max-height:100%}.shot figcaption{margin-top:6px} .slide-cta{align-self:end}
  .s-owl h2{font-size:clamp(34px,11vw,52px)}
  .s-contact .slide-inner{grid-template-columns:minmax(0,1fr);align-content:start;row-gap:8px;padding-top:calc(var(--header) + 20px);padding-bottom:50px;align-items:start}
  .contact-intro{flex-direction:row;align-items:flex-end;justify-content:space-between;gap:10px}.s-contact h2{font-size:clamp(32px,10vw,44px)}.contact-intro .perch{margin-top:0}

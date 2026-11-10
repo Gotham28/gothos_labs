@@ -8,13 +8,14 @@ export default async (page, { base, shots }) => {
   page.on('response', r => { if (r.status() >= 400) fails.push(r.status() + ' ' + r.url()); });
   // the five listed sizes, then the wide, short windows the review named
   const sizes = [[360, 640], [390, 844], [1280, 720], [1366, 768], [1440, 900], [1920, 760], [1760, 700], [1700, 660], [2560, 700], [1920, 640]];
-  let bad = 0, hitTotal = 0, ctlTotal = 0, hitOnOwl = 0;
+  let bad = 0, total = 0, hitTotal = 0, ctlTotal = 0, hitOnOwl = 0;
   for (const [w, h] of sizes) {
     await page.setViewportSize({ width: w, height: h });
     await page.goto('about:blank'); await page.goto(base + '/index.html', { waitUntil: 'networkidle' }); await page.waitForTimeout(800);
     const mode = await page.evaluate(() => Gothos.deck.active);
     if (!mode) { rows.push(`FAIL | ${w}x${h}: the deck is not active at a listed size`); bad++; continue; }
-    for (let i = 0; i < 6; i++) {
+    const slideCount = await page.evaluate(() => Gothos.deck.count); total += slideCount;
+    for (let i = 0; i < slideCount; i++) {
       await page.evaluate(i => Gothos.deck.go(i, { instant: true, push: false }), i);
       await page.waitForTimeout(1000);
       await page.screenshot({ path: `${shots}r2-fit-${w}x${h}-s${i + 1}.png` });
@@ -23,7 +24,8 @@ export default async (page, { base, shots }) => {
         const vw = innerWidth, vh = innerHeight, tol = 1;
         const out = { slideTop: slide.getBoundingClientRect().top, innerOverflow: inner.scrollHeight - inner.clientHeight, innerOverflowX: inner.scrollWidth - inner.clientWidth, clipped: [], overlap: [], docScroll: document.documentElement.scrollHeight - vh, imgs: [] };
         const hb = document.querySelector('.site-header').getBoundingClientRect().bottom;
-        const content = [...inner.querySelectorAll('h1,h2,p,a,button,img,figcaption,form,label,input,select,textarea,.slim-footer')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
+        // The enquiry honeypot is a spam trap parked off-screen on purpose (aria-hidden, left:-10000px); it is not content.
+        const content = [...inner.querySelectorAll('h1,h2,p,a,button,img,figcaption,form,label,input,select,textarea,.slim-footer')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && !e.closest('.enquiry-honeypot'));
         const name = e => (e.tagName + '.' + (e.className || '') + ':' + (e.textContent || '').trim().slice(0, 22)).trim();
         for (const e of content) {
           const r = e.getBoundingClientRect();
@@ -67,6 +69,6 @@ export default async (page, { base, shots }) => {
       rows.push(`${flag ? 'FAIL' : 'ok  '} ${w}x${h} s${i + 1}: top=${r.slideTop.toFixed(2)} innerOverflow=${r.innerOverflow}/${r.innerOverflowX} docScroll=${r.docScroll} clipped=${r.clipped.length} owlOverlap=${r.overlap.length} owlTopGap=${r.owlTopGap.toFixed(1)}px | controls=${r.controls} samples=${r.hits} resolvingToOwl=${r.onOwl} owlHitCentreOK=${r.centreIsHit} oldBoxCornerOnOwl=${r.cornerOnOwl}${r.imgs.length ? ' | img ' + r.imgs.map(m => `${Math.round(m.w)}x${Math.round(m.h)} of ${m.nw}x${m.nh} ratioErr=${(m.ratioErr * 100).toFixed(2)}% inside=${m.inside}`).join(' ; ') : ''}${flag ? ' ' + JSON.stringify({ c: r.clipped, o: r.overlap, off: r.offenders }) : ''}`);
     }
   }
-  rows.push(`SUMMARY: ${sizes.length * 6} section/size runs, ${bad} failing; finding 1: ${ctlTotal} control checks, ${hitTotal} sample points, ${hitOnOwl} resolved to the owl layer`);
+  rows.push(`SUMMARY: ${total} section/size runs, ${bad} failing; finding 1: ${ctlTotal} control checks, ${hitTotal} sample points, ${hitOnOwl} resolved to the owl layer`);
   return { errs, fails, rows };
 };

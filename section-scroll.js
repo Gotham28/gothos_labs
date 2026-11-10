@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   // Section transition engine. The landing page is a deck of full-screen
-  // sections; one gesture (wheel burst, swipe or key) moves exactly one, the move
+  // sections (any number; each is a direct child of .deck-track); one gesture (wheel burst, swipe or key) moves exactly one, the move
   // cannot be stopped or reversed, and owl.js reads sample() each frame so the
   // owl flies in step with it. When the screen is too short, or a section's
   // content does not fit, the deck switches itself off and the page scrolls
@@ -15,6 +15,17 @@
   const N = slides.length;
   // The URL hash for each slide; #owl cannot be a slide id, the owl button holds it.
   const ids = slides.map(slide => slide.dataset.hash || slide.id);
+  // The side dots are built from the slides, so a new slide needs only a data-label:
+  // each dot links to the slide's hash and reads "<label>, section N of M".
+  const dotNav = document.getElementById('deck-dots');
+  if (dotNav) {
+    dotNav.replaceChildren(...slides.map((slide, i) => {
+      const dot = document.createElement('a');
+      dot.href = '#' + ids[i];
+      dot.setAttribute('aria-label', `${slide.dataset.label || slide.querySelector('h1, h2')?.textContent.trim() || ids[i]}, section ${i + 1} of ${N}`);
+      return dot;
+    }));
+  }
   const dots = [...document.querySelectorAll('#deck-dots a')];
   const links = [...document.querySelectorAll('.nav-links a[href^="#"]')];
   const WHEEL_GAP = 160;       // quiet time (ms) that ends a wheel gesture, inertia tail included

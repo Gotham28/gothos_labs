@@ -4,7 +4,7 @@
 
 The developer-supplied owl logo PNG and 40-second motion reference guide this green/white redesign. The company logo's leaf silhouette is retained as flat SVG for navigation and the final lockup. The developer's later instruction explicitly adopts the video's realistic dimensional mascot shading for flight/chat; presentation-sheet captions, browser chrome and garbled copy remain excluded. Video and temporary frame-inspection tooling are never committed.
 
-The main brief and identical Addendum A attachments are referenced in .agents/CURRENT_TASK.md. Addendum A determines the five-stop order and the separation of ELogBook, the hospital assistant and Hoot.
+The main brief and identical Addendum A attachments are referenced in .agents/CURRENT_TASK.md. Addendum A determines the five-stop order and the separation of ELogBook, the hospital assistant and Mochi (the website guide, formerly shown as Hoot).
 
 ## Preserved ELogBook evidence provenance
 
@@ -30,7 +30,7 @@ The original pasted React Bits GhostFibers source and CSS remain in reference-so
 
 Poppins Latin WOFF2 weights 300/400/500/600/700/800 were downloaded from the official Google Fonts stylesheet/font hosts; the upstream google/fonts ofl/poppins/OFL.txt is bundled as licenses/Poppins-OFL.txt. No runtime font service is contacted.
 
-No invented pricing, testimonials, customer endorsements, clinical outcomes, provider keys or contact addresses. Enquiries are local text downloads, never simulated delivery. Hoot is a company guide and does not give medical advice.
+No invented pricing, testimonials, customer endorsements, clinical outcomes, provider keys or contact addresses. Enquiries are local text downloads, never simulated delivery. Mochi is a company guide and does not give medical advice.
 
 
 

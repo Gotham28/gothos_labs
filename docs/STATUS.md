@@ -32,10 +32,10 @@ Imported Gothos-labs unchanged and established project governance.
   file bytes and an empty content diff.
 
 ### Catch-up — 2026-11-03
-Rebuilt the landing page as six full-screen sections with a section-transition
+Rebuilt the landing page as six full-screen sections (seven since 2026-11-10) with a section-transition
 engine and an owl that perches in each section and flies between them; added
 ELogBook and AROGYA product pages; real Gothos Labs logo; 16-pose sprite owl.
-- Landing: Gothos Labs hero, What we do, ELogBook, AROGYA, Ask the owl (Hoot),
+- Landing: Gothos Labs hero, What we do, ELogBook, AROGYA, Ask the owl (Hoot; now Ask Mochi),
   Talk to us (local-brief enquiry form). One gesture moves one section. The
   section deck runs from 360x640 up where every section fits; on shorter or
   narrower screens, or when a section stops fitting, the page scrolls normally.
@@ -43,7 +43,7 @@ ELogBook and AROGYA product pages; real Gothos Labs logo; 16-pose sprite owl.
   links work in both modes.
 - elogbook.html (six-screen illustrative preview, role tabs) and arogya.html
   (illustrative chat card, disclaimer, disabled live-demo button), each with a
-  small perched owl that opens Hoot.
+  small perched owl that opens Hoot (now Mochi).
 - Copy: developer-supplied; the "What we do" wording is a developer-approved draft.
 - Branch: bird-updated
 - PR: #2 https://github.com/x3O8/Gothos-labs/pull/2
@@ -116,3 +116,19 @@ Notes / Open Questions: live indexing, ranking and external sharing previews hav
   - Inline PowerShell XML/JSON/metadata checks — `PASS sitemap XML: exactly three expected canonical URLs; Organization JSON: five expected properties and values`; all three page checks report unchanged body; `PASS 26 public page/runtime/discovery references exist and none are excluded by .vercelignore`.
   - `git diff --check` — exit 0; only line-ending conversion warnings.
 - Deferred: publication and developer Search Console verification, submission and inspection steps in docs/SEO.md. Live indexing/ranking and external sharing previews unverified.
+
+### Catch-up — 2026-11-10 (Software, perfected by AI)
+Home page repositioned as "Software, perfected by AI". Added an Our products panel, panel names became the large headings, the website guide is now named Mochi, and the deck is a seven-panel deck that takes further product panels.
+- Branch: `vercel-publish`
+- PR: none opened; push only, authorized by the developer 2026-11-10. Merge and deployment not performed.
+- Commits: pending
+- Review: standard/medium, four independent read-only lenses; one send-back (fix round), developer accepted 2026-11-10 without a second review of the fix round. Direct-executor tier unratcheted; no Antigravity tier (AGENTS.md §12.9).
+- Verification (fresh output in HANDOFF.md, run on a local server at 127.0.0.1:4178 after the last source edit):
+  - `node --check section-scroll.js; node --check chat.js; node --check hoot-api.mjs` — exit 0 for each.
+  - `node .agents/runs/run.mjs .agents/runs/v1-core.mjs` — PASS=81 FAIL=0.
+  - `... v2-fit.mjs` — 70 section/size runs, 0 failing.
+  - `... v3-owl.mjs` — 7 slides, 10508 frames, 0 outside the viewport, 0 hidden, maxLandDx 3.62, maxLandDy 2.02.
+  - `... v5-pages.mjs` — PASS=58 FAIL=0 SKIP=1.
+  - `... v6-mode.mjs` — PASS=62 FAIL=0.
+- Not verified: real-device touch; the production chat endpoint with a live key; v5 item 13 (skipped: enquiries now post to `/api/enquiry`, no download).
+- Deferred: `PRODUCT.md` and `docs/MASTER_PLAN.md` hold this task's edits plus staged text from the replaced enquiry task, so both were left out of the commit until that task is resolved; `v4-input.mjs` not converted to id/count lookups; chat chips in `chat.js` still say "Arogya Health Assistant"; the index noscript line still mentions "local enquiry downloads"; owl perch after a late font swap and the `.claude/launch.json` port belong to Task 2; the `?v=deck-3` and `?v=sprite-1` cache-bust tokens were not bumped; the Products nav link has no `aria-current` on the ELogBook and AROGYA slides.

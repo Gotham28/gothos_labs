@@ -77,7 +77,7 @@
   }
 
   const REFUSAL = "I'm Gothos's website guide, so I can't give medical advice. Please speak to a doctor, or contact your local emergency services if it's urgent.";
-  const GREETING = "Hi, I'm Hoot! How can I help you today?";
+  const GREETING = "Hi, I'm Mochi! How can I help you today?";
   const medical = text => /\b(symptoms?|pain|fever|cough|bleed\w*|medicine|medication|dosage|dose|diagnos\w*|treat\w*|emergenc\w*|suicid\w*|overdose|chest|breath\w*|stroke|pregnan\w*|prescri\w*|injur\w*|sick|illness|dizz\w*|nause\w*|vomit\w*|rash|antibiotic|insulin|tablet|pills?|paracetamol|ibuprofen|cancer|headache|migraine|diabet\w*|blood|glucose|cholesterol|heart|asthma|allerg\w*|infect\w*|fracture|covid|seizure|unconscious|faint\w*|wound|burns?|swollen|swelling|numb\w*|weakness|anxiety|anxious|depress\w*)\b|\b(should i take|can i take|stop taking|feel unwell|hurt\w*|health (advice|problem|question|issue|concern))\b|വേദന|മരുന്ന്|പനി/i.test(text);
   let stage='idle', name='', demoEmail='', demoId='', epoch=0, pending=null, controller=null, history=[];
   function message(text, user=false) {

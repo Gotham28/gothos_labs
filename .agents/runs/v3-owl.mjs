@@ -5,12 +5,20 @@ export default async (page, { base }) => {
   const rows = [], errs = [];
   page.on('pageerror', e => errs.push(e.message));
   page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.text()); });
-  const pairs = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 4], [4, 3], [3, 2], [2, 1], [1, 0], [0, 5], [5, 0], [2, 4], [4, 1]];
+  // Transitions follow the slide count: every neighbour pair forward and back, first<->last, and two mid jumps.
+  const pairsFor = n => {
+    const p = [], last = n - 1;
+    for (let i = 0; i < last; i++) p.push([i, i + 1]);
+    for (let i = last; i > 0; i--) p.push([i, i - 1]);
+    p.push([0, last], [last, 0], [Math.min(2, last), Math.max(last - 1, 0)], [Math.max(last - 1, 0), Math.min(1, last)]);
+    return p;
+  };
   const summary = { frames: 0, outside: 0, hidden: 0, minGap: 1e9, maxLandDx: 0, maxLandDy: 0, maxRate: 0, maxStep: 0, minBeats: 9, maxBeats: 0, maxDrift: 0, maxDur: 0, minDur: 1e9 };
   for (const [w, h] of [[1440, 900], [1366, 768], [1280, 720], [390, 844], [360, 640]]) {
     await page.setViewportSize({ width: w, height: h });
     await page.goto('about:blank'); await page.goto(base + '/index.html', { waitUntil: 'networkidle' }); await page.waitForTimeout(900);
-    rows.push(`--- ${w}x${h}`);
+    const slideCount = await page.evaluate(() => Gothos.deck.count), pairs = pairsFor(slideCount);
+    rows.push(`--- ${w}x${h} (${slideCount} slides, ${pairs.length} transitions)`);
     const res = await page.evaluate(async pairs => {
       const sleep = ms => new Promise(r => setTimeout(r, ms));
       const fr = Gothos.sprite.frames, boxes = Object.values(fr).map(f => f.bbox), maxW = Math.max(...boxes.map(b => b[2] - b[0])), K0 = 400 * .92 / maxW;

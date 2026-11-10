@@ -15,10 +15,15 @@ export default async (page, { base }) => {
     return { active: d.active, cur: d.current, seen, top: d.slides[Math.max(0, seen)].getBoundingClientRect().top, y: scrollY, hash: location.hash, moving: d.moving, act: (a.tagName + '#' + a.id).slice(0, 40), focusSlide: fs, mode: document.documentElement.className };
   });
 
+  // Slide positions come from the page (by id / slide count), never from literals, so the deck can grow.
+  await open('index.html', [1440, 900]);
+  const IDS = await page.evaluate(() => Gothos.deck.slides.map(s => s.dataset.hash || s.id));
+  const ix = id => { const i = IDS.indexOf(id); if (i < 0) throw new Error('no slide ' + id); return i; };
+
   // ---- N1: deep links land on the section, in either mode
-  rows.push('N1: cold loads (mode shown per case; sections: top=0 elogbook=2 owl=4 contact=5)');
+  rows.push('N1: cold loads (mode shown per case; slides: ' + IDS.map((id, i) => id + '=' + i).join(' ') + ')');
   for (const size of [[1920, 640], [1700, 660], [1920, 600], [844, 390], [1440, 900]]) {
-    for (const [hash, want] of [['#contact', 5], ['#owl', 4], ['#elogbook', 2]]) {
+    for (const [hash, want] of [['#contact', ix('contact')], ['#owl', ix('owl')], ['#elogbook', ix('elogbook')]]) {
       await open('index.html' + hash, size); const s = await info();
       ok(s.seen === want && (s.active ? Math.abs(s.top) < 1 : Math.abs(s.top) < 90), `N1: ${sizeOf(size)} index.html${hash}: deck ${s.active ? 'on' : 'off (scrolling)'}, section in view ${s.seen}, its top ${s.top.toFixed(1)}px, scrollY ${Math.round(s.y)}`);
     }
@@ -27,20 +32,20 @@ export default async (page, { base }) => {
     await open('elogbook.html', size);
     const b = await page.locator('.pp-hero a.pill--solid').boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
     await page.waitForLoadState('networkidle'); await page.waitForTimeout(1500); const s = await info();
-    ok(s.seen === 5 && (s.active ? Math.abs(s.top) < 1 : Math.abs(s.top) < 90), `N1: ${sizeOf(size)} elogbook.html > Request a demo: deck ${s.active ? 'on' : 'off'}, section in view ${s.seen}, top ${s.top.toFixed(1)}px, url ${await page.evaluate(() => location.pathname + location.hash)}`);
+    ok(s.seen === ix('contact') && (s.active ? Math.abs(s.top) < 1 : Math.abs(s.top) < 90), `N1: ${sizeOf(size)} elogbook.html > Request a demo: deck ${s.active ? 'on' : 'off'}, section in view ${s.seen}, top ${s.top.toFixed(1)}px, url ${await page.evaluate(() => location.pathname + location.hash)}`);
     await open('arogya.html', size); const b2 = await page.locator('.pp-cta a.pill', { hasText: 'Talk to us' }).boundingBox();
     await page.evaluate(() => document.querySelector('.pp-cta').scrollIntoView({ block: 'center' })); const b3 = await page.locator('.pp-cta a.pill', { hasText: 'Talk to us' }).boundingBox(); await page.mouse.click(b3.x + b3.width / 2, b3.y + b3.height / 2);
     await page.waitForLoadState('networkidle'); await page.waitForTimeout(1500); const s2 = await info();
-    ok(s2.seen === 5, `N1: ${sizeOf(size)} arogya.html > Talk to us: section in view ${s2.seen}, top ${s2.top.toFixed(1)}px`);
+    ok(s2.seen === ix('contact'), `N1: ${sizeOf(size)} arogya.html > Talk to us: section in view ${s2.seen}, top ${s2.top.toFixed(1)}px`);
   }
   // a resize while scrolled in scrolling mode keeps the section in view
   for (const [from, to] of [[[1920, 600], [1900, 590]], [[1920, 600], [1700, 560]], [[844, 390], [800, 380]], [[1920, 600], [1500, 620]]]) {
     await open('index.html', from); const was = await info();
     ok(!was.active, `N1: ${sizeOf(from)} starts in scrolling mode`);
-    await page.evaluate(() => { Gothos.deck.slides[2].scrollIntoView({ block: 'start' }); window.scrollBy(0, 140); }); await page.waitForTimeout(500);
+    await page.evaluate(() => { document.getElementById('elogbook').scrollIntoView({ block: 'start' }); window.scrollBy(0, 140); }); await page.waitForTimeout(500);
     const before = await info();
     await page.setViewportSize({ width: to[0], height: to[1] }); await page.waitForTimeout(700); const after = await info();
-    ok(!after.active && after.seen === 2 && before.seen === 2, `N1: scrolled into section 3 at ${sizeOf(from)} (scrollY ${Math.round(before.y)}), resized to ${sizeOf(to)}: section in view ${after.seen}, scrollY ${Math.round(after.y)}, deck ${after.active ? 'on' : 'off'}`);
+    ok(!after.active && after.seen === ix('elogbook') && before.seen === ix('elogbook'), `N1: scrolled into the ELogBook section at ${sizeOf(from)} (scrollY ${Math.round(before.y)}), resized to ${sizeOf(to)}: section in view ${after.seen}, scrollY ${Math.round(after.y)}, deck ${after.active ? 'on' : 'off'}`);
   }
 
   // ---- N2: resizing gives the same mode as a fresh load
@@ -67,27 +72,27 @@ export default async (page, { base }) => {
   // ---- N5: URL and focus after a mode switch
   rows.push('N5: URL and focus after a mode switch');
   await open('index.html#contact', [1920, 600]); const n0 = await info(); ok(!n0.active, 'N5a: starts in scrolling mode at 1920x600');
-  await page.click('input[name=name]'); await page.evaluate(() => { Gothos.deck.slides[2].scrollIntoView({ block: 'start' }); }); await page.waitForTimeout(500);
+  await page.click('input[name=name]'); await page.evaluate(() => { document.getElementById('elogbook').scrollIntoView({ block: 'start' }); }); await page.waitForTimeout(500);
   const preFocus = await info();
   await page.setViewportSize({ width: 1440, height: 900 }); await page.waitForTimeout(900); const n1 = await info();
-  ok(n1.active && n1.cur === 2 && n1.hash === '#elogbook' && n1.focusSlide !== 5 && n1.act.startsWith('H2#elb-title'), `N5a: was scrolled to section 3 (url said #contact, focus in the name field: ${preFocus.act}); after switching to the deck: shows section ${n1.cur + 1}, url ${n1.hash}, focus ${n1.act}`);
+  ok(n1.active && n1.cur === ix('elogbook') && n1.hash === '#elogbook' && n1.focusSlide !== ix('contact') && n1.act.startsWith('H2#elb-title'), `N5a: was scrolled to the ELogBook section (url said #contact, focus in the name field: ${preFocus.act}); after switching to the deck: shows section ${n1.cur + 1}, url ${n1.hash}, focus ${n1.act}`);
   await open('index.html', [1440, 900]); await page.keyboard.press('ArrowDown'); await page.waitForTimeout(300);
   const mid0 = await info(); await page.setViewportSize({ width: 1920, height: 560 }); await page.waitForTimeout(1200); const n2 = await info();
   ok(mid0.moving && !n2.active && !n2.moving && n2.cur === 1 && n2.seen === 1 && n2.hash === '#what-we-do', `N5b: switched to scrolling in the middle of a move (moving=${mid0.moving} just before): move completed, section in view ${n2.seen}, url ${n2.hash}, moving=${n2.moving}`);
   await page.setViewportSize({ width: 1440, height: 900 }); await page.waitForTimeout(900); const n3 = await info();
   ok(n3.active && n3.cur === 1 && n3.hash === '#what-we-do', `N5b: back to the deck shows section ${n3.cur + 1}, url ${n3.hash}`);
   await page.keyboard.press('ArrowDown'); await page.waitForTimeout(1600); const n4 = await info();
-  ok(n4.cur === 2 && n4.act.startsWith('H2#elb-title'), `N5b: the next move still focuses the new heading: section ${n4.cur + 1}, focus ${n4.act}`);
+  ok(n4.cur === ix('products') && n4.act.startsWith('H2#products-title'), `N5b: the next move still focuses the new heading: section ${n4.cur + 1}, focus ${n4.act}`);
 
   // ---- N6: scrolling-mode links move focus
   rows.push('N6: scrolling mode, section links move focus');
   await open('index.html', [1920, 600]); const l0 = await info(); ok(!l0.active, 'N6: scrolling mode at 1920x600');
   const nb = await page.locator('.nav-links a[href="#contact"]').boundingBox(); await page.mouse.click(nb.x + nb.width / 2, nb.y + nb.height / 2); await page.waitForTimeout(1500);
-  let l1 = await info(); ok(l1.act.startsWith('H2#contact-title') && l1.seen === 5, `N6: mouse click on Talk to us: focus ${l1.act}, section in view ${l1.seen}`);
-  await page.keyboard.press('Tab'); const l2 = await info(); ok(l2.focusSlide === 5, `N6: Tab continues inside the contact section: focus ${l2.act} (section ${l2.focusSlide + 1})`);
-  await open('index.html', [1920, 600]); await page.locator('.nav-links a[href="#elogbook"]').focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(1500);
+  let l1 = await info(); ok(l1.act.startsWith('H2#contact-title') && l1.seen === ix('contact'), `N6: mouse click on Talk to us: focus ${l1.act}, section in view ${l1.seen}`);
+  await page.keyboard.press('Tab'); const l2 = await info(); ok(l2.focusSlide === ix('contact'), `N6: Tab continues inside the contact section: focus ${l2.act} (section ${l2.focusSlide + 1})`);
+  await open('index.html', [1920, 600]); await page.locator('.nav-links a[href="#products"]').focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(1500);
   const l3 = await info(); await page.keyboard.press('Tab'); const l4 = await info();
-  ok(l3.act.startsWith('H2#elb-title') && l4.focusSlide === 2, `N6: keyboard Enter on ELogBook: focus ${l3.act}; next Tab goes to ${l4.act} (section ${l4.focusSlide + 1})`);
+  ok(l3.act.startsWith('H2#products-title') && l4.focusSlide === ix('products'), `N6: keyboard Enter on Products: focus ${l3.act}; next Tab goes to ${l4.act} (section ${l4.focusSlide + 1})`);
 
   // ---- minors
   rows.push('minors');
@@ -98,7 +103,7 @@ export default async (page, { base }) => {
   await open('index.html', [1440, 900]); await page.keyboard.press('End'); await page.waitForTimeout(1600); await page.evaluate(() => document.querySelector('.skip-link').focus()); await page.keyboard.press('Enter'); await page.waitForTimeout(600); const sk = await info();
   await page.keyboard.press('Tab'); await page.waitForTimeout(1500); const sk2 = await info();
   ok(sk.act.startsWith('H2#contact-title'), `skip link lands on the section on screen: focus ${sk.act}`);
-  ok(sk2.cur === 5, `Tab after the skip link does not pull the deck backwards: section ${sk2.cur + 1}, focus ${sk2.act}`);
+  ok(sk2.cur === IDS.length - 1, `Tab after the skip link does not pull the deck backwards: section ${sk2.cur + 1}, focus ${sk2.act}`);
   await open('index.html', [1440, 900]); await page.evaluate(() => sessionStorage.removeItem('gothos-motion-paused')); await page.locator('#motion-control').scrollIntoViewIfNeeded().catch(() => {});
   await page.evaluate(() => { document.getElementById('motion-control').click(); }); await page.waitForTimeout(100); await page.keyboard.press('ArrowDown'); await page.waitForTimeout(60);
   const fade = await page.evaluate(() => { const an = document.getAnimations().filter(x => x.animationName === 'position-fade' || x.animationName === 'slide-fade').map(x => x.animationName + ':' + x.effect.getTiming().duration); return an; });
@@ -111,7 +116,7 @@ export default async (page, { base }) => {
   rows.push('owl click area in flight');
   for (const size of [[1440, 900], [390, 844]]) {
     await open('index.html', size); let flights = 0, samples = 0, onOwl = 0, flyingSeen = 0;
-    for (const [a, b] of [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0]]) {
+    for (const [a, b] of IDS.map((_, i) => [i, (i + 1) % IDS.length])) {
       await page.evaluate(a => Gothos.deck.go(a, { instant: true, push: false }), a); await page.waitForTimeout(700);
       await page.evaluate(b => Gothos.deck.go(b, { push: false }), b);
       for (let k = 0; k < 9; k++) {

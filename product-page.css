@@ -3,7 +3,8 @@ body.product-page{background:linear-gradient(180deg,#fbfaf6,#f3f6ef 40%,#f7f6f1)
 .product-main{padding-top:var(--header);min-height:100vh}
 .pp-wrap{width:min(1100px,calc(100% - 2 * var(--gx)));margin-inline:auto}
 .pp-hero{position:relative;overflow:hidden;isolation:isolate;padding:clamp(36px,8vh,88px) 0 clamp(30px,6vh,60px);background:radial-gradient(55% 70% at 88% 8%,rgba(190,225,200,.7),transparent 70%),radial-gradient(45% 60% at 4% 100%,rgba(205,230,213,.8),transparent 70%)}
-.pp-hero h1{font-weight:800;font-size:clamp(32px,5.2vw,66px);line-height:1.06;letter-spacing:-.04em;color:var(--forest);max-width:18ch;text-wrap:balance}
+.pp-hero h1{font-weight:800;font-size:clamp(40px,7vw,88px);line-height:1.04;letter-spacing:-.045em;color:var(--forest);max-width:18ch;text-wrap:balance}
+.pp-hero .tagline{font-size:clamp(18px,2.2vw,28px);max-width:30ch}
 .pp-lede{margin-top:clamp(14px,2.6vh,24px);font-size:clamp(15px,1.4vw,19px);line-height:1.7;color:#3f5448;max-width:680px}
 .pp-hero .button-row{margin-top:clamp(20px,3.6vh,32px)}
 .pilot-line,.proof-line{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;color:var(--forest);margin-top:20px}

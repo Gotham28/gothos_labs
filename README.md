@@ -14,17 +14,17 @@ Open http://127.0.0.1:4177/. The existing server binds to loopback only. PORT ca
 
 ## Website
 
-The landing page (index.html) is six full-screen sections that change one at a time: hero, What we do, ELogBook, AROGYA, Ask the owl (Hoot) and Talk to us (enquiry form, with a slim footer line). One wheel or trackpad gesture, swipe or key press moves exactly one section in a 1.0–1.2 second ease-in-out transition that cannot be stopped midway. A feathered sprite owl, drawn from sixteen poses so it turns through front, three-quarter, side and rear views as it flies, perches in each section and flies to the next perch during each transition. Deep links `#what-we-do`, `#elogbook`, `#arogya`, `#owl` and `#contact` work, as do the header links, side dots, back and forward. The site uses cream, sage and forest-green tokens (direction "calm and airy") and locally bundled Poppins 300/400/500/600/700/800.
+Gothos Labs is positioned as "Software, perfected by AI." The landing page (index.html) is seven full-screen sections that change one at a time: hero, What we do, Our products, ELogBook, AROGYA, Ask Mochi (the owl, our website guide) and Talk to us (enquiry form, with a slim footer line). On every panel the name is the large heading and the former tagline is a medium subheading beneath it. One wheel or trackpad gesture, swipe or key press moves exactly one section in a 1.0–1.2 second ease-in-out transition that cannot be stopped midway. A feathered sprite owl, drawn from sixteen poses so it turns through front, three-quarter, side and rear views as it flies, perches in each section and flies to the next perch during each transition. Deep links `#what-we-do`, `#products`, `#elogbook`, `#arogya`, `#owl` and `#contact` work, as do the header links, the side dots (generated from the slides), back and forward. The site uses cream, sage and forest-green tokens (direction "calm and airy") and locally bundled Poppins 300/400/500/600/700/800.
 
-ELogBook and AROGYA detail live on two ordinary scrolling pages, elogbook.html and arogya.html, with a small perched owl that opens Hoot. The product copy for the landing page, ELogBook and AROGYA is developer-supplied (2026-11-02) and is used as given; the "What we do" wording is a developer-approved draft built from the developer's direction. See PRODUCT.md.
+ELogBook and AROGYA detail live on two ordinary scrolling pages, elogbook.html and arogya.html, with a small perched owl that opens Mochi. The product copy for the landing page, ELogBook and AROGYA is developer-supplied (2026-11-02) and is used as given; the "What we do" wording is a developer-approved draft built from the developer's direction. See PRODUCT.md.
 
 elogbook.html carries the original six illustrative screens, keyboard tabs and shared expanded dialog. Empty states are intentional: no authenticated, resident or patient records are loaded. The two landing-page screenshots in assets/screens/ are snapshots of those previews, labelled illustrative.
 
-Hoot is the website guide, separate from both products. Company questions go to a private OpenAI-backed endpoint; the editable HOOT_KNOWLEDGE.md supplies product facts. Medical questions receive a local refusal, and demo enquiries are sent only after explicit visitor confirmation and email-provider acceptance. It never confirms a booking. Inputs stay in browser memory, are rendered as text and are cleared when Hoot closes. Only the motion-pause preference uses sessionStorage.
+Mochi (the owl; internal identifiers still say "hoot") is the website guide, separate from both products. Company questions go to a private OpenAI-backed endpoint; the editable HOOT_KNOWLEDGE.md supplies product facts. Medical questions receive a local refusal, and demo enquiries are sent only after explicit visitor confirmation and email-provider acceptance. It never confirms a booking. Inputs stay in browser memory, are rendered as text and are cleared when Mochi closes. Only the motion-pause preference uses sessionStorage.
 
 ## Source layout
 
-- index.html: the six landing sections, the Hoot dialog and the owl's sprite host. Each section has an empty `.perch` box that reserves the owl's resting place.
+- index.html: the seven landing sections, the Mochi dialog and the owl's sprite host. Each section has an empty `.perch` box that reserves the owl's resting place.
 - elogbook.html, arogya.html: product pages (shared header, scrolling layout, native dialogs, a perched owl in place of a chat button).
 - styles.css: page tokens, local font declarations, header, buttons, the section deck and each section's layout, forms and dialogs.
 - product-page.css: shared styles for the two product pages and the illustrative AROGYA chat card.
@@ -34,14 +34,24 @@ Hoot is the website guide, separate from both products. Company questions go to 
 - site.js: shared motion state, dialogs, preview tabs and expanded dialog (ELogBook page only), enquiry submission and assistant configuration.
 - owl.js: one shared requestAnimationFrame scheduler, the sprite renderer (pose, yaw, wingbeat, blink), per-section perches read from the layout, and flights driven by the transition's eased progress. On product pages it only perches the owl.
 - assets/screens/: elogbook-preview.webp and arogya-preview.webp, snapshots of the illustrative previews captured from the local pages (no personal data).
-- chat.js / owl-chat.css: Hoot interactions, conversation state and presentation.
+- chat.js / owl-chat.css: Mochi interactions, conversation state and presentation.
 - assets/logo/gothos-logo.png: the real Gothos Labs mark, cropped from the supplied logo image (mark only, background keyed to transparent, no redrawing or recolouring). Used for the header, favicon and the AROGYA card. On the dark header state it sits on a small light plate.
 - assets/logo/gothos-owl.svg: the earlier flat mark, no longer referenced by the page.
 - assets/owl/owl-atlas.webp and owl-atlas.json: the owl's 16 poses in one atlas with frame rects and a shared head anchor. Built, not hand-edited; rebuild with `python tools/build-owl-atlas.py` (Python 3 and Pillow, dev only, never loaded by the site). assets/owl/source/owl-sheet.webp is the 4x4 source sheet it reads; a higher-resolution sheet of the same art can be passed with `--sheet` and gives the same frame layout. See DESIGN.md.
 - tools/build-owl-atlas.py: the dev-only atlas builder above.
 - fonts/ and licenses/: local assets and original licenses; Poppins has its own SIL OFL file.
 - reference-source/: original GhostFibers sources and archived buildless adapter. None is loaded at runtime.
-- server.mjs: dependency-free local server and private Hoot API route.
+- server.mjs: dependency-free local server and private Mochi API route (code and config keep the original `hoot` names).
+
+## Adding a product
+
+The deck is built to take more product panels. To add one:
+
+1. In `index.html`, add a `<section class="slide s-product s-<name>" id="<name>" data-label="<Name>" aria-labelledby="<name>-title">` after the last product slide, copying the ELogBook slide: `slide-text` (an `h2` with the product name and `tabindex="-1"`, a `.tagline`, a `.lede`), a `.shot` figure and a `.slide-cta` holding the button and a `.perch`. Add `is-flipped` to put the screenshot on the left; alternate it for rhythm.
+2. Add the product to the `.product-list` in the `#products` slide (a `.product-link` with `.product-name` and `.product-line`).
+3. In `styles.css`, add one `.s-<name>{background:…}` rule for the tint. The layout comes from `.s-product`.
+4. Write the product page (copy `arogya.html` as a starting point: the `h1` is the product name and the `.tagline` follows it) and add its link to the footers.
+5. Nothing else: `section-scroll.js` builds the side dots from the slides and `owl.js` finds each slide's `.perch`. Run `.agents/runs/v2-fit.mjs` and `v3-owl.mjs` to check the new slide fits at every size and the owl lands on its perch; they size themselves from the number of slides.
 
 ## Assistant configuration
 
@@ -51,13 +61,13 @@ The single SITE_CONFIG block in site.js controls assistantUrl, assistantFrameAll
 
 For a genuine configured demo, verify its public route and current frame policy first. If framing is blocked, set assistantFrameAllowed false and use the new-tab path; changing that product's frame-ancestors policy is separate work in its own repository. The conditional dialog always includes a new-tab link, the personal-health-information notice and the supplied medical disclaimer. Its iframe is created only on activation and removed on close. Microphone delegation is added only when assistantVoiceVerified is true; actual browser permission is still necessary. No embedded voice interaction has been validated here.
 
-Hoot's editable facts live in `HOOT_KNOWLEDGE.md`. Keep them approved, concise and free of secrets or patient data. Its API code is in `hoot-api.mjs`, exposed locally by `server.mjs` and on Vercel by `api/chat.mjs`. It accepts POST `{messages}` and returns `{reply}`. API calls use `store: false`; no chat transcript is written by this repository. The browser shows a plain unavailable message when the API is not configured or fails.
+Mochi's editable facts live in `HOOT_KNOWLEDGE.md`. Keep them approved, concise and free of secrets or patient data. Its API code is in `hoot-api.mjs`, exposed locally by `server.mjs` and on Vercel by `api/chat.mjs`. It accepts POST `{messages}` and returns `{reply}`. API calls use `store: false`; no chat transcript is written by this repository. The browser shows a plain unavailable message when the API is not configured or fails.
 
 For the local preview, edit the ignored `hoot.config.local.json` and put the OpenAI key in `apiKey`; change `model` in the same file. It starts with `gpt-4o-mini` because the owner asked to choose the model, but official documentation currently marks that model deprecated. Set a supported model when ready. Never commit the local file. In Vercel, create a private environment variable named `HOOT_CONFIG_JSON` whose value is the same JSON object containing `apiKey` and `model`; it overrides the local file. Redeploy after setting it. No API key belongs in HTML, `chat.js`, a committed file, or a chat message. The local preview stays dependency-free (`npm.cmd run dev`).
 
 ## Honest local enquiries
 
-The form and Hoot's confirmed demo enquiries now call `/api/enquiry`, implemented locally in `server.mjs` and on Vercel in `api/enquiry.mjs`. The recipient is fixed to `therealgautam2004@gmail.com`; the sender and Resend key come from Git-ignored `enquiry.config.local.json` locally, or a private `ENQUIRY_CONFIG_JSON` environment variable on Vercel. No booking is made. See `EMAIL_SETUP.md` for domain, key, deployment, and live delivery checks. The site retains the form contents on failure and uses a retry ID to avoid duplicate emails.
+The form and Mochi's confirmed demo enquiries now call `/api/enquiry`, implemented locally in `server.mjs` and on Vercel in `api/enquiry.mjs`. The recipient is fixed to `therealgautam2004@gmail.com`; the sender and Resend key come from Git-ignored `enquiry.config.local.json` locally, or a private `ENQUIRY_CONFIG_JSON` environment variable on Vercel. No booking is made. See `EMAIL_SETUP.md` for domain, key, deployment, and live delivery checks. The site retains the form contents on failure and uses a retry ID to avoid duplicate emails.
 
 ## Motion and accessibility
 
