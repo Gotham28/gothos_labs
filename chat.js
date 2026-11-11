@@ -26,54 +26,59 @@
     const host = document.createElement('span');
     host.className = 'owl-sprite'; avatar.replaceChildren(host);
     avatarSprite = site.sprite.create(host); avatarSprite.show('perch', false);
+    site.behavior.registerAvatar(avatarSprite);
   });
-  let transfer = null;
+  let transfer = null, activation = null, dialogRun = 0;
   function stopTransfer() {
     if (!transfer) return;
     transfer.animation.cancel(); transfer.element.remove(); transfer = null;
   }
-  // Take-off crouch, one wingbeat (up, level, down, level), landing crouch, then
-  // the perched frame the header avatar shows.
-  const FLIGHT = [[0,'crouch'],[.12,'front-up'],[.28,'front-level'],[.44,'front-down'],[.62,'front-level'],[.78,'crouch'],[.9,'perch']];
+  const clamp01 = n => Math.min(1,Math.max(0,n));
+  const smooth = (a,b,x) => {const t=clamp01((x-a)/(b-a));return t*t*(3-2*t);};
   function fly(from, to) {
+    site.behavior.setOwner('transfer');
     stopTransfer();
-    if (!site.motion.enabled || !site.sprite.frames) return Promise.resolve();
-    const element = document.createElement('div');
-    element.className = 'chat-owl-transfer';
-    const host = document.createElement('span');
-    host.className = 'owl-sprite'; element.append(host);
-    const clone = site.sprite.create(host);
-    const start = site.flight.pose();
-    clone.show(start.key, start.mirror);
+    if (!site.motion.enabled || document.hidden || !site.sprite.drawable) return Promise.resolve();
+    const element=document.createElement('div');
+    element.className='chat-owl-transfer';
+    const host=document.createElement('span');
+    host.className='owl-sprite';
+    element.append(host);
+    const clone=site.sprite.create(host);
+    const position=(x,y,width) => 'translate('+x+'px,'+y+'px) scale('+width/400+')';
+    element.style.transform=position(from.left,from.top,from.width);
+    clone.show('perch');
     dialog.append(element);
-    const pose = rect => `translate(${rect.left}px,${rect.top}px) scale(${rect.width/400})`;
-    const animation = element.animate([
-      {transform:pose(from)},
-      {transform:pose({left:(from.left+to.left)/2,top:(from.top+to.top)/2-36,width:(from.width+to.width)/2}),offset:.5},
-      {transform:pose(to)}
-    ], {duration:620,easing:'cubic-bezier(.22,.75,.22,1)',fill:'forwards'});
-    const current = transfer = {element,animation};
-    const play = () => {
-      if (transfer !== current) return;
-      const t = clamp01((animation.currentTime || 0) / 620);
-      clone.show(FLIGHT.filter(([at]) => t >= at).pop()[1], false, 50);
-      if (animation.playState === 'running') requestAnimationFrame(play);
+    const duration=620;
+    const animation=element.animate([{opacity:1},{opacity:1}],{duration});
+    const current=transfer={element,animation};
+    const play=()=>{
+      if (transfer!==current) return;
+      const t=clamp01((animation.currentTime||0)/duration);
+      const e=smooth(0,1,t);
+      const x=from.left+(to.left-from.left)*e;
+      const y=from.top+(to.top-from.top)*e-Math.sin(Math.PI*e)*36;
+      element.style.transform=position(x,y,from.width+(to.width-from.width)*e);
+      const spread=smooth(0,.23,t)*(1-smooth(.72,1,t));
+      clone.fly(spread,t*Math.PI*2*.94,to.left-from.left,t);
+      if (animation.playState==='running') requestAnimationFrame(play);
     };
     requestAnimationFrame(play);
-    return animation.finished.catch(() => {}).then(() => {
-      element.remove(); if (transfer === current) transfer = null;
+    return animation.finished.catch(()=>{}).then(()=>{
+      element.remove();
+      if (transfer===current) transfer=null;
     });
   }
-  const clamp01 = n => Math.min(1, Math.max(0, n));
   function avatarDestination() {
     const panel = dialog.querySelector('.chat-panel');
     const slot = {left:panel.offsetLeft-panel.offsetWidth/2+12,top:panel.offsetTop+14,size:64};
     return site.sprite.frames ? site.sprite.boxFor('perch', slot) : {left:slot.left,top:slot.top,width:64};
   }
   function animateClose() {
-    const from = transfer ? transfer.element.getBoundingClientRect() : avatar.getBoundingClientRect();
-    avatar.style.visibility = 'hidden';
-    return fly(from, pageOwl.getBoundingClientRect());
+    if (!dialog.open) return Promise.resolve();
+    const from=transfer ? transfer.element.getBoundingClientRect() : avatar.getBoundingClientRect();
+    avatar.style.visibility='hidden';
+    return fly(from,pageOwl.getBoundingClientRect());
   }
 
   const REFUSAL = "I'm Gothos's website guide, so I can't give medical advice. Please speak to a doctor, or contact your local emergency services if it's urgent.";
@@ -113,13 +118,19 @@
     if(pending.remaining<=0){const item=pending;pending=null;typing.hidden=true;form.querySelector('button').disabled=false;if(item.epoch===epoch){message(item.text);item.after?.();}}
   });
   function open(trigger, assistant=false) {
+    activation=null;
     if(dialog.open)return;
+    const run=++dialogRun;
     const origin = pageOwl.getBoundingClientRect();
     cancelPending();stage='idle';name='';demoEmail='';demoId='';history=[];list.replaceChildren();input.value='';
     site.openDialog(dialog,trigger);document.body.classList.add('chat-open');
     dispatchEvent(new CustomEvent('gothos-chat',{detail:{open:true}}));
     avatar.style.visibility = 'hidden';
-    fly(origin, avatarDestination()).then(() => { if(dialog.open && !dialog.classList.contains('is-closing')) avatar.style.visibility = ''; });
+    fly(origin, avatarDestination()).then(() => {
+      if(run===dialogRun && dialog.open && !dialog.classList.contains('is-closing')) {
+        avatar.style.visibility = ''; site.behavior.setOwner('chat');
+      }
+    });
     message(GREETING);
     if (site.motion.enabled) {
       const bubble = list.lastElementChild;
@@ -141,7 +152,11 @@
     if(medical(text)){stage='idle';name='';reply(REFUSAL,()=>chips());return;}
     // Existing topic chips must navigate, never become a demo name or email.
     if (/^(What does Gothos build\?|Arogya Health Assistant|Maybe later|I need support)$/i.test(text)) { stage='idle';name=''; }
-    if(/^book a demo$/i.test(text)){stage='name';name='';demoEmail='';demoId='';reply("Happily! What's your name?");return;}
+    if(/^book a demo$/i.test(text)){
+      stage='name';name='';demoEmail='';demoId='';
+      reply("Happily! What's your name?");
+      return;
+    }
     if(stage!=='idle' && (/\?/.test(text)||/^(what|how|why|can|could|should|is|are|do|does|i (have|feel|am feeling))\b/i.test(text))) {
       stage='idle';name='';
     }
@@ -190,9 +205,21 @@
     }
   }
   form.addEventListener('submit',e=>{e.preventDefault();send(input.value);});
-  document.querySelectorAll('[data-chat]').forEach(button=>button.addEventListener('click',()=>open(button,button.dataset.chat==='assistant')));
+  const finishTransfer = () => { if (transfer && (!site.motion.enabled || document.hidden)) transfer.animation.finish(); };
+  addEventListener('gothos-motion', finishTransfer);
+  document.addEventListener('visibilitychange', finishTransfer);
+  document.querySelectorAll('[data-chat]').forEach(button=>button.addEventListener('click',()=>{
+    if (!button.classList.contains('owl-hit')) { open(button,button.dataset.chat==='assistant'); return; }
+    if (dialog.open || activation) return;
+    const reaction=site.behavior.acknowledge();
+    if (!reaction) { open(button); return; }
+    const token=activation={};
+    reaction.then(()=>{ if (activation===token) open(button); });
+  }));
   dialog.addEventListener('close',()=>{
+    dialogRun++; activation=null;
     stopTransfer(); avatar.style.visibility = '';
+    site.behavior.setOwner('page');
     cancelPending();stage='idle';name='';demoEmail='';demoId='';history=[];input.value='';list.replaceChildren();
     document.body.classList.remove('chat-open');dispatchEvent(new CustomEvent('gothos-chat',{detail:{open:false}}));
   });

@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "date": "2026-11-10",
+  "status": "APPROVED_ARTWORK_2026-11-10",
+  "generator": "built-in image_gen",
+  "reference": "assets/owl/source/owl-sheet.webp",
+  "notes": [
+    "20 sequences / 80 generated keyframes, grouped in five 4x4 sheets.",
+    "Artwork only; runtime atlas, owl.js, chat.js and CSS not integrated.",
+    "Transparent output includes green edge specks/fringe; cleanup required before production.",
+    "Frames have approximate anchors; align foot/face anchors during approved atlas work.",
+    "Returned output resolution differs from the requested 2048 square; inspect actual PNG dimensions."
+  ],
+  "sheets": [
+    {
+      "id": 1,
+      "name": "natural-habits",
+      "generatedPath": "C:\\Users\\aravi\\.codex\\generated_images\\01a1c629-8a28-7c71-ad67-2b3ee9233e51\\exec-38afd5bb-59ef-4e4c-a088-b044a9b097d9.png",
+      "file": "mochi-natural-habits-v1.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent character animation sprite sheet, NOT a website mockup.\nInput image 1 is CHARACTER IDENTITY REFERENCE only. Recreate exactly its perched Mochi owl from the bottom row: big dark teal round eyes with small white highlights, cream heart-like face, tiny dark triangular beak, swept green brow/ear feathers, richly layered green LEAF feathers, short green tail leaning to viewer-left, two tiny orange feet. Match its polished softly shaded 2D cut-paper illustration, palette, lighting, face-to-body proportions. No redesign, no added clothing/accessories.\nOutput: 2048x2048 square PNG with REAL TRANSPARENT background, exactly 4 equal columns and 4 equal rows, 16 fully isolated full-body poses. One owl per cell, ordered row-major. No text, labels, grid lines, symbols, floor, cast shadow, watermark, magenta or checkerboard drawn into artwork. No cropping or overlap. Same full-body size and neutral camera in EVERY cell. Within each cell, center chest at x50% y52%, normal planted toes at y85%; ears normally at y17%. Leave ample transparent padding. Feet remain anchored except where movement specified. Change anatomy for head/wing/eye motions, not the whole canvas. Each row is one short readable action with 4 successive keyframes.\nSheet 1 of 5: NATURAL HABITS.\nROW 1 HEAD TILT: 1 neutral forward gaze; 2 head ONLY tilts 12 degrees to viewer-left with body upright; 3 head ONLY tilts 15 degrees to viewer-right curiously; 4 returns upright with a soft blink.\nROW 2 BREATHING: 1 calm neutral perch; 2 chest leaf feathers gently expand for inhale, feet planted; 3 chest feathers softly settle in exhale with eyes relaxed; 4 returns neutral. Subtle but distinguishable.\nROW 3 FEATHER PUFF / SHAKE: 1 crouch slightly with feathers compressed; 2 round fluffy chest and cheek feathers puff outward; 3 feathers ruffle asymmetrically during quick shake with closed content eyes; 4 sleek settled neutral feathers, bright eyes.\nROW 4 PREEN: 1 looks down toward its own wing; 2 head turns and beak tucks into raised shoulder feathers; 3 eyes closed while smoothing the leaf-feather tips with beak; 4 lifts head upright looking pleased.\nCONSISTENCY: same exact green owl in all cells, same face proportions and foot scale as reference. Transparent background. Do not draw flight poses.",
+      "columns": 4,
+      "rows": [
+        {
+          "id": "head-tilt",
+          "label": "Curious head tilt",
+          "row": 0
+        },
+        {
+          "id": "breathing",
+          "label": "Breathing",
+          "row": 1
+        },
+        {
+          "id": "feather-ruffle",
+          "label": "Feather puff and shake",
+          "row": 2
+        },
+        {
+          "id": "preen",
+          "label": "Preening",
+          "row": 3
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "footwork-stretches",
+      "generatedPath": "C:\\Users\\aravi\\.codex\\generated_images\\01a1c629-8a28-7c71-ad67-2b3ee9233e51\\exec-6c7509ee-ceba-430d-b6d5-9f8276d87fe5.png",
+      "file": "mochi-footwork-stretches-v1.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent character animation sprite sheet, NOT a website mockup.\nInput image 1 is CHARACTER IDENTITY REFERENCE only. Recreate exactly its perched Mochi owl from the bottom row: big dark teal round eyes with small white highlights, cream heart-like face, tiny dark triangular beak, swept green brow/ear feathers, richly layered green LEAF feathers, short green tail leaning to viewer-left, two tiny orange feet. Match its polished softly shaded 2D cut-paper illustration, palette, lighting, face-to-body proportions. No redesign, no added clothing/accessories.\nOutput: 2048x2048 square PNG with REAL TRANSPARENT background, exactly 4 equal columns and 4 equal rows, 16 fully isolated full-body poses. One owl per cell, ordered row-major. No text, labels, grid lines, symbols, floor, cast shadow, watermark, magenta or checkerboard drawn into artwork. No cropping or overlap. Same full-body size and neutral camera in EVERY cell. Within each cell, center chest at x50% y52%, normal planted toes at y85%; ears normally at y17%. Leave ample transparent padding. Feet remain anchored except where movement specified. Change anatomy for head/wing/eye motions, not the whole canvas. Each row is one short readable action with 4 successive keyframes.\nInput image 2 is the first draft sheet in this SAME set: match its owl drawing, face scale, palette and rendering exactly. Keep original reference identity.\nSheet 2 of 5: FOOTWORK AND STRETCHES, exactly 4 columns x 4 rows.\nROW 1 WEIGHT SHIFT / FOOT SHUFFLE: 1 neutral perch; 2 shifts weight onto viewer-left orange foot, opposite foot lifted slightly; 3 shifts onto viewer-right foot with opposite foot lifted; 4 settles both feet and looks forward.\nROW 2 ONE-WING STRETCH: 1 neutral perch; 2 one wing begins unfolding; 3 that same wing extends diagonally up and out while other wing stays folded, content eyes; 4 folds wing back with a small relaxed head tilt.\nROW 3 TWO-WING STRETCH: 1 eyes half closed before stretch; 2 both wings unfold slightly; 3 both wings fully extend sideways and upward in a gentle morning stretch, chest upright, FEET STAY PLANTED; 4 wings fold down into neutral.\nROW 4 SMALL HOP: 1 slight crouch anticipation with feet planted; 2 rises a small distance with feet tucked, both wings slightly open; 3 lands on both orange feet with compressed body; 4 upright settled perch, bright eyes.\nAll 16 poses use the SAME character at consistent scale, no floor or shadows. True alpha transparency. NO labels, text, divider lines, effects symbols or checkerboard. No human hands, no extra limbs. Wings stay fully within each individual cell.",
+      "columns": 4,
+      "rows": [
+        {
+          "id": "foot-shuffle",
+          "label": "Foot shuffle",
+          "row": 0
+        },
+        {
+          "id": "wing-stretch",
+          "label": "One-wing stretch",
+          "row": 1
+        },
+        {
+          "id": "both-wing-stretch",
+          "label": "Two-wing stretch",
+          "row": 2
+        },
+        {
+          "id": "hop",
+          "label": "Little hop",
+          "row": 3
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "signature-cute",
+      "generatedPath": "C:\\Users\\aravi\\.codex\\generated_images\\01a1c629-8a28-7c71-ad67-2b3ee9233e51\\exec-03ee7621-e8db-4564-8f9e-75c1390e883c.png",
+      "file": "mochi-signature-cute-v1.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent character animation sprite sheet, NOT a website mockup.\nInput image 1 is CHARACTER IDENTITY REFERENCE only. Recreate exactly its perched Mochi owl from the bottom row: big dark teal round eyes with small white highlights, cream heart-like face, tiny dark triangular beak, swept green brow/ear feathers, richly layered green LEAF feathers, short green tail leaning to viewer-left, two tiny orange feet. Match its polished softly shaded 2D cut-paper illustration, palette, lighting, face-to-body proportions. No redesign, no added clothing/accessories.\nOutput: 2048x2048 square PNG with REAL TRANSPARENT background, exactly 4 equal columns and 4 equal rows, 16 fully isolated full-body poses. One owl per cell, ordered row-major. No text, labels, grid lines, symbols, floor, cast shadow, watermark, magenta or checkerboard drawn into artwork. No cropping or overlap. Same full-body size and neutral camera in EVERY cell. Within each cell, center chest at x50% y52%, normal planted toes at y85%; ears normally at y17%. Leave ample transparent padding. Feet remain anchored except where movement specified. Change anatomy for head/wing/eye motions, not the whole canvas. Each row is one short readable action with 4 successive keyframes.\nInput image 2 is the first draft sheet in this same set: match its exact owl drawing, palette and scale. Image 1 locks original character identity.\nSheet 3 of 5: SIGNATURE CUTE ANIMATIONS, exactly 4 columns x 4 rows. Clean isolated silhouettes with no stray flecks outside the owl.\nROW 1 PEEKABOO: 1 lifts both leafy wings toward cheeks; 2 BOTH WINGS COMPLETELY COVER ITS FACE, only green ear tufts and feet visible; 3 separates wing tips just enough to peek with ONE round dark teal eye, other eye still covered; 4 lowers wings and looks delighted with happy crescent eyes. Face cover must be readable, not just outstretched wings.\nROW 2 TINY SNEEZE: 1 inhales with head tilted slightly back, half-lidded eyes and tiny beak slightly open; 2 sneeze moment: head thrusts down, eyes firmly shut, wings spread just slightly; 3 round puffed feathers and startled wide eyes; 4 calm forward-facing recovery with a small blink. No droplets, speech marks or written ACHOO.\nROW 3 HAPPY FEET: 1 pleased face while lifting one orange foot; 2 lifts the opposite orange foot in tiny dance step; 3 delighted small hop with feet tucked and wings slightly out, joyful crescent eyes; 4 both feet planted, soft fluffy happy settle.\nROW 4 SHY WAVE: 1 looks at visitor, wing starts lifting; 2 raises ONE wing tip beside face for a friendly wave, other wing folded; 3 hides one cheek behind that wing, eyes glance sideways bashfully; 4 lowers wing with a soft happy eye-squint.\nNO HUMAN HANDS/FINGERS. Keep bird anatomy, original green leaf feathers, tiny orange feet. Genuine transparent background, NO text, floor, shadows, separators, extra characters, stray particles.",
+      "columns": 4,
+      "rows": [
+        {
+          "id": "peekaboo",
+          "label": "Peekaboo",
+          "row": 0
+        },
+        {
+          "id": "sneeze",
+          "label": "Tiny sneeze",
+          "row": 1
+        },
+        {
+          "id": "happy-feet",
+          "label": "Happy feet",
+          "row": 2
+        },
+        {
+          "id": "shy-wave",
+          "label": "Shy wave",
+          "row": 3
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "sleepy-playful",
+      "generatedPath": "C:\\Users\\aravi\\.codex\\generated_images\\01a1c629-8a28-7c71-ad67-2b3ee9233e51\\exec-66791c34-d5c6-470c-b507-5debe95d459c.png",
+      "file": "mochi-sleepy-playful-v1.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent character animation sprite sheet, NOT a website mockup.\nInput image 1 is CHARACTER IDENTITY REFERENCE only. Recreate exactly its perched Mochi owl from the bottom row: big dark teal round eyes with small white highlights, cream heart-like face, tiny dark triangular beak, swept green brow/ear feathers, richly layered green LEAF feathers, short green tail leaning to viewer-left, two tiny orange feet. Match its polished softly shaded 2D cut-paper illustration, palette, lighting, face-to-body proportions. No redesign, no added clothing/accessories.\nOutput: 2048x2048 square PNG with REAL TRANSPARENT background, exactly 4 equal columns and 4 equal rows, 16 fully isolated full-body poses. One owl per cell, ordered row-major. No text, labels, grid lines, symbols, floor, cast shadow, watermark, magenta or checkerboard drawn into artwork. No cropping or overlap. Same full-body size and neutral camera in EVERY cell. Within each cell, center chest at x50% y52%, normal planted toes at y85%; ears normally at y17%. Leave ample transparent padding. Feet remain anchored except where movement specified. Change anatomy for head/wing/eye motions, not the whole canvas. Each row is one short readable action with 4 successive keyframes.\nInput image 2 is the first draft sheet of this same set. Match its exact owl drawing, face proportions, palette, soft leaf-feather rendering and scale.\nSheet 4 of 5: SLEEPY AND PLAYFUL HABITS, exactly 4 columns x 4 rows. Clean silhouettes. No stray background particles except the ONE intentional small green feather in row3.\nROW 1 SLEEPY RECOVERY: 1 half-lidded drowsy eyes, body upright; 2 eyes fully closed and HEAD droops forward, brow lower, body still upright; 3 suddenly perks head up with surprised wide-open eyes and wings slightly out to steady itself; 4 resumes an attentive upright perch, eyes bright. Show clear nod-off and wake-up.\nROW 2 HEAD SCRATCH: 1 raises one orange foot toward lower cheek, balances on the other; 2 raised foot gently scratches side of head, head tilted toward it, eyes content; 3 wobbles slightly to the side, ONE wing extends a little for balance; 4 both feet planted, pleased and composed. Owl feet/claws only, NO hands, no fingers, no extra legs.\nROW 3 FEATHER CHASE: 1 looks up at ONE tiny loose green leaf-shaped feather floating above and to the side of its head; 2 eyes track the feather as it drifts closer, head tilts; 3 catches that SINGLE feather delicately at beak tip with pleased eyes; 4 tucks that feather into its chest using a wing, then looks pleased. Keep entire feather and owl inside their own cell.\nROW 4 PLAYFUL BOW: 1 small head dip, wings begin opening; 2 deep bow forward, head low, both feet planted, tail slightly lifted; 3 almost tips forward, wings open a little to steady itself, playful wide eyes; 4 pops upright with joyful crescent eyes and wings folded.\nMaintain original perched body mass and orange toes, owl anatomy. TRUE TRANSPARENT BACKGROUND. No text, labels, floor, shadow, grid, heart symbols, exclamation marks or extra props.",
+      "columns": 4,
+      "rows": [
+        {
+          "id": "sleepy-recovery",
+          "label": "Sleepy recovery",
+          "row": 0
+        },
+        {
+          "id": "head-scratch",
+          "label": "Head scratch",
+          "row": 1
+        },
+        {
+          "id": "feather-chase",
+          "label": "Feather chase",
+          "row": 2
+        },
+        {
+          "id": "bow",
+          "label": "Playful bow",
+          "row": 3
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "chat-reactions",
+      "generatedPath": "C:\\Users\\aravi\\.codex\\generated_images\\01a1c629-8a28-7c71-ad67-2b3ee9233e51\\exec-de86a941-8483-419e-b3d5-2aeceb23f4c5.png",
+      "file": "mochi-chat-reactions-v1.png",
+      "prompt": "Use case: illustration-story. Asset type: transparent character animation sprite sheet, NOT a website mockup.\nInput image 1 is CHARACTER IDENTITY REFERENCE only. Recreate exactly its perched Mochi owl from the bottom row: big dark teal round eyes with small white highlights, cream heart-like face, tiny dark triangular beak, swept green brow/ear feathers, richly layered green LEAF feathers, short green tail leaning to viewer-left, two tiny orange feet. Match its polished softly shaded 2D cut-paper illustration, palette, lighting, face-to-body proportions. No redesign, no added clothing/accessories.\nOutput: 2048x2048 square PNG with REAL TRANSPARENT background, exactly 4 equal columns and 4 equal rows, 16 fully isolated full-body poses. One owl per cell, ordered row-major. No text, labels, grid lines, symbols, floor, cast shadow, watermark, magenta or checkerboard drawn into artwork. No cropping or overlap. Same full-body size and neutral camera in EVERY cell. Within each cell, center chest at x50% y52%, normal planted toes at y85%; ears normally at y17%. Leave ample transparent padding. Feet remain anchored except where movement specified. Change anatomy for head/wing/eye motions, not the whole canvas. Each row is one short readable action with 4 successive keyframes.\nInput image 2 is the first draft sheet of the same set: match that exact drawing, eye/face scale, palette, feather shapes and soft shading.\nSheet 5 of 5: CHAT EXPRESSIONS AND ATTENTIVE REACTIONS, exactly 4 columns x 4 rows. These gestures must read at small avatar size.\nROW 1 HAPPY EYES AND REPLY NOD: 1 soft attentive forward gaze; 2 joyful crescent-shaped closed eyes with slightly fluffy cheeks; 3 small head-only downward nod with happy eyes, body remains upright; 4 head returns upright, eyes open and content.\nROW 2 LISTENING LEAN: 1 neutral forward gaze; 2 leans head/upper chest forward slightly with interested wide eyes, feet stay anchored; 3 small head tilt while listening, same slight lean, one brow gently raised; 4 relaxed upright forward gaze. Subtle curious friendly expression, not startled.\nROW 3 THINKING GLANCE: 1 pupils look upward to viewer-left, beak closed; 2 head tilts a little and pupils look upward to viewer-right; 3 thoughtful slow blink with half-lids, head upright; 4 forward attentive eyes. No thought bubbles, question marks, symbols or props.\nROW 4 LOOK BEFORE DEPARTURE: 1 forward neutral perch; 2 turns HEAD ONLY toward viewer-right with body front-facing; 3 head and upper body turn to three-quarter right, eyes looking toward destination, wings remain folded; 4 low takeoff anticipation crouch facing three-quarter right with wings just starting to open and FEET STILL PLANTED. Retain owl identity during turn.\nKeep all gestures consistent and restrained. Same scale in every cell, same small orange feet, no mouth smile or human facial features. True transparent background, clean edges, no stray particles, no text/grid/shadows/floor.",
+      "columns": 4,
+      "rows": [
+        {
+          "id": "happy-nod",
+          "label": "Happy eyes and nod",
+          "row": 0
+        },
+        {
+          "id": "listening",
+          "label": "Listening lean",
+          "row": 1
+        },
+        {
+          "id": "thinking",
+          "label": "Thinking glance",
+          "row": 2
+        },
+        {
+          "id": "departure-look",
+          "label": "Look before departure",
+          "row": 3
+        }
+      ]
+    }
+  ]
+}
