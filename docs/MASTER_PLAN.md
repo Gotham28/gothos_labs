@@ -29,3 +29,28 @@
 ### 2026-11-05 — SEO basics
 Not in the original plan. Add discovery files and page metadata to identify the canonical public pages, plus manual Search Console guidance.
 Scope: index.html, elogbook.html, arogya.html, robots.txt, sitemap.xml, local server MIME mappings and docs/SEO.md. Related: CURRENT_TASK.md dated 2026-11-05.
+
+### 2026-11-10 — Website enquiry delivery
+Not in the original plan. Connect the contact form and visitor-confirmed Hoot demo requests to a shared Resend endpoint delivering to the developer-confirmed inbox. Preserve local-only brief downloads as a distinct helper; sending requires secure runtime configuration and actual inbox verification.
+Scope: index.html, site.js, chat.js, api/enquiry.mjs, server.mjs, tests/enquiry.test.mjs, .vercelignore, README.md and PRODUCT.md. Related: CURRENT_TASK.md dated 2026-11-10. No deployment or cross-repository changes.
+
+### 2026-11-10 — "Perfected by AI" repositioning, Our products panel and Mochi
+Not in the original plan. The home page is repositioned around "Software, perfected by AI": a new Our products section after What we do, section names as the large headings, the owl guide renamed Mochi in everything visitors see, and a deck that takes further product sections without code changes.
+Scope: index.html, elogbook.html, arogya.html, styles.css, product-page.css, section-scroll.js, chat.js and hoot-api.mjs (name strings only), HOOT_KNOWLEDGE.md, README.md, PRODUCT.md, DESIGN.md, REFERENCE.md and .agents/runs scripts. Related: CURRENT_TASK.md dated 2026-11-10. Animation robustness follows as a separate task; no deployment.
+
+### 2026-11-10 — Enquiry email via Resend, configured like eLogbook
+Not in the original plan. The deployed contact form already posts to `/api/enquiry`, but no Resend key or sender is set. The endpoint switches to eLogbook's `RESEND_API_KEY` / `EMAIL_FROM` settings, sends to `gothoslabs@gmail.com`, and gets real tests, setup notes and a verified `gothoslabs.com` sending subdomain.
+Scope: enquiry-api.mjs, tests/enquiry.test.mjs, package.json (test script), EMAIL_SETUP.md, README.md enquiry lines, index.html noscript line, .agents/runs/v5-pages.mjs item 13. Related: CURRENT_TASK.md dated 2026-11-10. DNS, Vercel settings, merge and deployment are developer steps.
+
+### 2026-11-10 — Mochi natural, cute and chat animations
+Not in the original plan. Adds 20 character sequences using five developer-approved source sheets: natural habits, playful moments and reactions driven by chat state. A shared controller schedules quiet intervals and cancels gestures for flight, transfers, motion settings and document visibility; original 16-pose flight geometry is retained.
+Scope: owl.js, chat.js animation hooks, owl-chat.css, owl atlas/source assets, tools/build-owl-atlas.py, owl asset version tokens in the three pages, .agents/runs/v7-owl-idle.mjs and local artwork/animation evidence. Related: CURRENT_TASK.md dated 2026-11-10. Local implementation; independent review and acceptance precede close-out. No publication.
+
+### 2026-11-11 — Six-motion Mochi refinement
+The revised mascot waves on arrival, tilts its head in What we do, bows in Ask Mochi, breathes at rest, nods on direct activation, and flies between perches and chat. The two section gestures replay on entry after separate 12-second cooldowns. Direct activation uses the same button for mouse, touch and keyboard.
+
+The animation uses the approved perched artwork with continuously transformed head and wing geometry. The original 16 atlas frames retain their registration, and one approved wave frame supplies the raised wing. Motion settings and an interrupted gesture allow chat to open without waiting for the motion to finish. Scope and local verification are recorded in `.agents/CURRENT_TASK.md` and `HANDOFF.md`.
+
+### 2026-11-11 — Public website privacy and DPDP preparation
+
+Adds a local Privacy Policy draft for Gothos Lab Private Limited, short notices for contact enquiries and Mochi, and an operator review draft for privacy requests and data handling. The scope covers the public website and its enquiry and AI flows. Policy approval, production configuration verification and release are tracked in `.agents/CURRENT_TASK.md`.

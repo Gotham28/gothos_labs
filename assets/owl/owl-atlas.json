@@ -1,6 +1,6 @@
 {
- "version": 1,
- "image": "owl-atlas.webp",
+ "version": 3,
+ "image": "owl-atlas.webp?v=polish-1",
  "order": [
   "front-up",
   "quarter-up",
@@ -17,11 +17,12 @@
   "perch",
   "blink",
   "perch-quarter",
-  "crouch"
+  "crouch",
+  "shy-wave-1"
  ],
  "atlas": [
   2936,
-  1652
+  2065
  ],
  "cell": [
   734,
@@ -394,6 +395,39 @@
    ],
    "talons": 0,
    "scale": 0.8728
+  },
+  "shy-wave-1": {
+   "x": 0,
+   "y": 1652,
+   "bbox": [
+    196,
+    55,
+    495,
+    382
+   ],
+   "faceCentre": [
+    367,
+    187.75
+   ],
+   "scale": 1.2595
   }
- }
+ },
+ "baseOrder": [
+  "front-up",
+  "quarter-up",
+  "side-up",
+  "rear-up",
+  "front-level",
+  "quarter-level",
+  "side-level",
+  "rear-level",
+  "front-down",
+  "quarter-down",
+  "side-down",
+  "rear-down",
+  "perch",
+  "blink",
+  "perch-quarter",
+  "crouch"
+ ]
 }

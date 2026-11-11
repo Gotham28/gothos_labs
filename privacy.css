@@ -1,0 +1,55 @@
+.privacy-header,
+.privacy-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 18px var(--gx);
+  color: var(--forest);
+  font-size: 14px;
+}
+
+.privacy-header { border-bottom: 1px solid #d6e3d8; }
+.privacy-footer { border-top: 1px solid #d6e3d8; }
+.privacy-main {
+  width: min(760px, calc(100% - 2 * var(--gx)));
+  margin-inline: auto;
+  padding-block: clamp(32px, 7vw, 80px);
+  overflow-wrap: anywhere;
+}
+
+.privacy-main h1 {
+  color: var(--forest);
+  font-size: clamp(34px, 6.2vw, 62px);
+  letter-spacing: -.045em;
+}
+
+.privacy-lede {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: clamp(15px, 2vw, 19px);
+}
+
+.privacy-draft {
+  margin-top: 20px;
+  padding: 11px 15px;
+  border-left: 3px solid var(--emerald);
+  background: #e9efe5;
+  color: var(--deep);
+  font-size: 14px;
+}
+
+.privacy-main section { margin-top: 34px; }
+.privacy-main h2 { color: var(--forest); font-size: clamp(21px, 4vw, 28px); }
+.privacy-main h3 { margin-top: 19px; color: var(--deep); font-size: 16px; }
+.privacy-main section p { margin-top: 10px; line-height: 1.7; }
+.privacy-page a:not(.brand) { text-underline-offset: 3px; }
+
+#enquiry-privacy,
+#mochi-privacy { font-size: 11px; }
+
+@media (max-width: 759px) {
+  #mochi-privacy { padding-bottom: 0; }
+  #chat-form { margin-bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
+}

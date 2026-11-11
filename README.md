@@ -67,7 +67,7 @@ For the local preview, edit the ignored `hoot.config.local.json` and put the Ope
 
 ## Honest local enquiries
 
-The form and Mochi's confirmed demo enquiries now call `/api/enquiry`, implemented locally in `server.mjs` and on Vercel in `api/enquiry.mjs`. The recipient is fixed to `therealgautam2004@gmail.com`; the sender and Resend key come from Git-ignored `enquiry.config.local.json` locally, or a private `ENQUIRY_CONFIG_JSON` environment variable on Vercel. No booking is made. See `EMAIL_SETUP.md` for domain, key, deployment, and live delivery checks. The site retains the form contents on failure and uses a retry ID to avoid duplicate emails.
+The form and Mochi's confirmed demo enquiries now call `/api/enquiry`, implemented locally in `server.mjs` and on Vercel in `api/enquiry.mjs`. The recipient is fixed to `gothoslabs@gmail.com`; the sender and Resend key come from Git-ignored `enquiry.config.local.json` locally, or a private `ENQUIRY_CONFIG_JSON` environment variable on Vercel. No booking is made. See `EMAIL_SETUP.md` for domain, key, deployment, and live delivery checks. The site retains the form contents on failure and uses a retry ID to avoid duplicate emails.
 
 ## Motion and accessibility
 
