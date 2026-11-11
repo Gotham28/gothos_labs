@@ -1,6 +1,6 @@
 # Enable Gothos Labs enquiry emails
 
-The Talk to us form and Hoot's confirmed demo requests now call `/api/enquiry`. The destination is fixed in `enquiry-api.mjs` as `therealgautam2004@gmail.com`. A successful response means Resend accepted the message for delivery; check the inbox to confirm arrival. No booking is made by submitting an enquiry.
+The Talk to us form and Hoot's confirmed demo requests now call `/api/enquiry`. The destination is fixed in `enquiry-api.mjs` as `gothoslabs@gmail.com`. A successful response means Resend accepted the message for delivery; check the inbox to confirm arrival. No booking is made by submitting an enquiry.
 
 ## Your setup steps
 
@@ -18,7 +18,7 @@ The Talk to us form and Hoot's confirmed demo requests now call `/api/enquiry`. 
 
    Save the file, start the site with `npm.cmd run dev`, and submit a small test enquiry at `http://127.0.0.1:4177/#contact`. This local server needs no package installation. Do not put the key in a tracked file or in chat.
 5. For **Vercel**, open the Gothos Labs project in the Vercel dashboard. Under **Settings → Environment Variables**, create `ENQUIRY_CONFIG_JSON`. Its value is the same single-line JSON object containing `apiKey` and `from`. Apply it to the environments where the site should send email (Production and, if you will test a preview deployment, Preview). Save it and redeploy so the function receives the new variable. The local config file is not deployed.
-6. On the updated site, submit one synthetic enquiry from the Talk to us form. Check the displayed result, Resend's email activity, and the Gmail inbox at `therealgautam2004@gmail.com`, including Spam. Reply to the message and confirm it addresses the test visitor's email. Also test a demo enquiry through Hoot; it asks for an explicit yes before sending.
+6. On the updated site, submit one synthetic enquiry from the Talk to us form. Check the displayed result, Resend's email activity, and the Gmail inbox at `gothoslabs@gmail.com`, including Spam. Reply to the message and confirm it addresses the test visitor's email. Also test a demo enquiry through Hoot; it asks for an explicit yes before sending.
 
 ## If a test fails
 

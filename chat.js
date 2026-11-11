@@ -154,7 +154,7 @@
     if (/^(What does Gothos build\?|Arogya Health Assistant|Maybe later|I need support)$/i.test(text)) { stage='idle';name=''; }
     if(/^book a demo$/i.test(text)){
       stage='name';name='';demoEmail='';demoId='';
-      reply("Happily! What's your name?");
+      reply("Draft notice: I’ll ask for your name and email so the Gothos Labs team can follow up. Resend delivers the enquiry after you confirm. Happily! What's your name?");
       return;
     }
     if(stage!=='idle' && (/\?/.test(text)||/^(what|how|why|can|could|should|is|are|do|does|i (have|feel|am feeling))\b/i.test(text))) {

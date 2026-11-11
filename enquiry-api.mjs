@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const configUrl = new URL('./enquiry.config.local.json', import.meta.url);
-const destination = 'therealgautam2004@gmail.com';
+const destination = 'gothoslabs@gmail.com';
 const topics = new Set(['ELogBook', 'AROGYA', 'A medical software project', 'Partnership', 'Book a demo']);
 const recentRequests = new Map();
 const emailPattern = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
